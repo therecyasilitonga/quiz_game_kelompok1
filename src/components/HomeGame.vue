@@ -27,7 +27,7 @@
         </div>
       </div>
 
-      <p class="hint">Tip: Timed mode gives bonus difficulty!</p>
+      <p class="hint">TEKAN UNTUK MEMULAI!</p>
     </main>
   </div>
 </template>
