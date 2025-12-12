@@ -157,6 +157,8 @@
 
 <PersonalitySystem ref="pSystem" @done="savePersonality" />
 
+
+
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 
@@ -171,20 +173,71 @@ const showCountdown = ref(false);
 function startCountdown(cb) {
   showCountdown.value = true;
   countdown.value = 3;
+
   const t = setInterval(() => {
+    soundCountdown(); // tiap angka berbunyi
     countdown.value--;
+
     if (countdown.value < 0) {
       clearInterval(t);
       showCountdown.value = false;
-      // tiny delay so UI shows GO briefly
-      setTimeout(() => { cb && cb(); }, 120);
+
+      playBeep(1000, 0.2); // suara "GO!"
+
+      setTimeout(() => cb && cb(), 120);
     }
   }, 1000);
 }
 
+
+
+/* ==== SOUND GENERATOR (tanpa file) ==== */
+function playBeep(freq = 500, duration = 0.15, type = "sine") {
+  const ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = type;
+  osc.frequency.value = freq;
+
+  gain.gain.setValueAtTime(0.15, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start();
+  osc.stop(ctx.currentTime + duration);
+}
+
+/* Suara yang berbeda-beda */
+function soundCorrect() {
+  playBeep(750, 0.2, "square"); // suara benar
+}
+
+function soundWrong() {
+  playBeep(180, 0.3, "sawtooth"); // suara salah
+}
+
+function soundClick() {
+  playBeep(350, 0.08, "triangle"); // klik tombol
+}
+
+function soundStart() {
+  playBeep(600, 0.15);
+  setTimeout(() => playBeep(800, 0.15), 150);
+  setTimeout(() => playBeep(1000, 0.15), 300);
+}
+
+function soundCountdown() {
+  playBeep(300, 0.12, "square");
+}
+
+
 /* ===== NAVIGATION ===== */
 function startGame(id) {
-  // start countdown then initialize game
+  soundClick();
+  soundStart();
   startCountdown(() => {
     if (id === 'vocab') {
       resetVocab();
@@ -406,10 +459,12 @@ function answerVocab(idx) {
 
   const correct = currentVocab.value.answerIndex;
   if (idx === correct) {
+    soundCorrect();
     vocabScore.value += 10;
     vocabMessage.value = 'Correct!';
     vocabMessageType.value = 'success';
   } else {
+    soundWrong();
     vocabMessage.value = 'Wrong answer.';
     vocabMessageType.value = 'error';
   }
@@ -474,10 +529,12 @@ function checkColorAnswer() {
     return;
   }
   if (user === currentColor.value.en || user === currentColor.value.id) {
+    soundCorrect();
     colorMessage.value = 'Correct!';
     colorMessageType.value = 'success';
     colorScore.value += 5;
   } else {
+    soundWrong();
     colorMessage.value = `Wrong — correct is "${currentColor.value.en}" / "${currentColor.value.id}"`;
     colorMessageType.value = 'error';
   }
@@ -531,10 +588,12 @@ function checkLogicAnswer() {
     return;
   }
   if (user === correct) {
+    soundCorrect();
     logicMessage.value = 'Correct!';
     logicMessageType.value = 'success';
     logicScore.value += 5;
   } else {
+    soundWrong();
     logicMessage.value = `Wrong — correct: ${currentLogic.value.answer}`;
     logicMessageType.value = 'error';
   }
