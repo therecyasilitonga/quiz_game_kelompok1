@@ -1,9 +1,9 @@
 <template>
   <div class="landing-content-wrapper">
     <main class="main-content">
-      <h1>Selamat Datang di English Brain Training” 👾</h1>
+      <h1>Selamat Datang di English Brain Training </h1>
       <p>
-        Game petualangan teks untuk memulihkan ingatan Detha dan memecahkan misteri bunker.
+        Game Bermain dan Belajar.
       </p>
       <div class="buttons">
         <button class="register-button" @click="goRegister">Register</button>
