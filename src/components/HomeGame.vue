@@ -6,7 +6,7 @@
     <div class="bubble-layer3"></div>
 
     <main class="content" aria-live="polite">
-      <h1 class="title">🌿 Welcome to EBT!</h1>
+      <h1 class="title">Welcome to EBT!</h1>
       <p class="subtitle">English Brain Training — Ready to boost your skills?</p>
 
       <div class="controls">

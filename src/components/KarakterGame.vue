@@ -3,7 +3,7 @@
     <main class="main-content">
       <div class="karakter-card">
 
-        <h1>🔍 Personality Scanner</h1>
+        <h1>Personality Scanner</h1>
         <p class="subtitle">Pilih tes, jawab pertanyaan, dan sistem akan membaca pola jawabmu — bukan hanya skor.</p>
 
         <!-- GAME SELECTOR -->

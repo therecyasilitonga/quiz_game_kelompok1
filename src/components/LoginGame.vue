@@ -3,7 +3,7 @@
     <main class="main-content">
       <div class="form-card">
         <h1>Selamat datang di laman Login EBT Game</h1>
-        <p class="tagline">Break the mystery immediately!</p>
+        <p class="tagline">mulai menjelajahi website ini. Belajar bersama!</p>
         <form @submit.prevent="handleLogin" class="login-form">
           <div class="form-group">
             <label for="identifier">Username atau Email</label>
