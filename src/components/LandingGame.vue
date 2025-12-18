@@ -1,7 +1,7 @@
 <template>
   <div class="landing-content-wrapper">
     <main class="main-content">
-      <h1>Selamat Datang di English Brain Training </h1>
+      <h1>Selamat Datang di Fun Vocabulary Learning Quiz  </h1>
       <p>
         Game Bermain dan Belajar.
       </p>
@@ -81,8 +81,8 @@ const goRegister = () => {
 .register-button,
 .login-button {
   background-color: #222;
-  border: 2px solid #0f0;
-  color: #0f0;
+  border: 2px solid rgb(0, 153, 255);
+  color: rgb(0, 123, 255);
   padding: 0.75rem 1rem;
   font-family: 'Press Start 2P', monospace;
   cursor: pointer;
@@ -92,7 +92,7 @@ const goRegister = () => {
 
 .register-button:hover,
 .login-button:hover {
-  background-color: #0f0;
+  background-color: rgb(0, 64, 255);
   color: #111;
 }
 
