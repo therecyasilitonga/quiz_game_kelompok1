@@ -1,54 +1,53 @@
 <template>
   <div class="landing-content-wrapper">
     <main class="main-content">
-      <h1>Selamat Datang di Fun Vocabulary Learning Quiz  </h1>
-      <p>
-        Game Bermain dan Belajar.
+      <h1>Fun Vocabulary Learning Quiz</h1>
+
+      <p class="subtitle">
+        Belajar kosakata bahasa Inggris dengan cara seru, interaktif,
+        dan penuh tantangan!
       </p>
+
       <div class="buttons">
-        <button class="register-button" @click="goRegister">Register</button>
-        <button class="login-button" @click="goLogin">Login Sebagai Pemain</button>
+        <button class="register-button" @click="goRegister">
+          📝 Register
+        </button>
+        <button class="login-button" @click="goLogin">
+          ▶ Login Sebagai Pemain
+        </button>
       </div>
     </main>
-    </div>
+  </div>
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'
 
-
-const router = useRouter();
+const router = useRouter()
 
 const goLogin = () => {
-  router.push('/login');
-};
+  router.push('/login')
+}
 
 const goRegister = () => {
-  router.push('/register');
-};
-
-// handleLogout tidak lagi diperlukan di sini karena sudah ada di navbar global App.vue
+  router.push('/register')
+}
 </script>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+/* =============================
+   LAYOUT
+============================= */
 .landing-content-wrapper {
-  /*
-  Container ini menggantikan .landing-container sebelumnya.
-  Perhatikan bahwa background dan font family mungkin sudah diatur di body/html atau App.vue
-  jadi pastikan tidak terjadi duplikasi atau override yang tidak diinginkan.
-  Jika App.vue sudah mengatur background dan font, ini mungkin tidak diperlukan lagi.
-  */
-  min-height: calc(100vh - var(--navbar-height) - var(--footer-height)); /* Sesuaikan tinggi jika navbar/footer fixed */
+  min-height: calc(100vh - var(--navbar-height, 0px) - var(--footer-height, 0px));
   display: flex;
   flex-direction: column;
-  flex: 1; /* Penting agar komponen ini mengisi sisa ruang setelah navbar/footer */
-  background-color: #111; /* Tetap pertahankan jika ini unik untuk halaman landing */
-  color: #fff;
+  background-color: #0b0b0b;
+  color: #ffffff;
   font-family: 'Press Start 2P', monospace;
 }
-
 
 .main-content {
   flex: 1;
@@ -60,74 +59,86 @@ const goRegister = () => {
   padding: 3rem 1rem;
 }
 
+/* =============================
+   TEXT
+============================= */
 .main-content h1 {
   font-size: 1.2rem;
   margin-bottom: 1.5rem;
+  color: #22ff88;
+  text-shadow: 0 0 8px rgba(34, 255, 136, 0.6);
 }
 
-.main-content p {
+.subtitle {
   font-size: 0.75rem;
-  max-width: 500px;
-  margin-bottom: 2rem;
+  max-width: 520px;
+  margin-bottom: 2.5rem;
+  line-height: 1.8;
+  color: #cccccc;
 }
 
+/* =============================
+   BUTTONS
+============================= */
 .buttons {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-  justify-content: center; /* Agar tombol rata tengah di mobile */
+  justify-content: center;
 }
 
 .register-button,
 .login-button {
-  background-color: #222;
-  border: 2px solid rgb(0, 153, 255);
-  color: rgb(0, 123, 255);
-  padding: 0.75rem 1rem;
+  background-color: #111;
+  border: 2px solid #22ff88;
+  color: #22ff88;
+  padding: 0.75rem 1.2rem;
   font-family: 'Press Start 2P', monospace;
   cursor: pointer;
-  transition: background-color 0.3s, color 0.3s;
-  white-space: nowrap; /* Mencegah teks tombol pecah */
+  transition: all 0.25s ease;
+  white-space: nowrap;
 }
 
 .register-button:hover,
 .login-button:hover {
-  background-color: rgb(0, 64, 255);
-  color: #111;
+  background-color: #22ff88;
+  color: #0b0b0b;
+  transform: translateY(-2px);
 }
 
-/* Media Queries */
+.register-button:active,
+.login-button:active {
+  transform: scale(0.95);
+}
+
+/* =============================
+   RESPONSIVE
+============================= */
 @media (max-width: 768px) {
   .main-content h1 {
     font-size: 1rem;
   }
-  .main-content p {
+
+  .subtitle {
     font-size: 0.7rem;
   }
+
   .register-button,
   .login-button {
     font-size: 0.7rem;
-    padding: 0.6rem 0.9rem;
+    padding: 0.6rem 1rem;
   }
 }
 
 @media (max-width: 480px) {
-  .main-content {
-    padding: 2rem 0.75rem;
-  }
-  .main-content h1 {
-    font-size: 0.9rem;
-  }
-  .main-content p {
-    font-size: 0.65rem;
-  }
   .buttons {
     flex-direction: column;
-    width: 80%; /* Agar tombol memanjang di mobile */
+    width: 85%;
   }
+
   .register-button,
   .login-button {
-    width: 100%; /* Agar tombol memanjang penuh */
+    width: 100%;
   }
 }
 </style>
