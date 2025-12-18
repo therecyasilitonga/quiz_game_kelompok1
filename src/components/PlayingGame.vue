@@ -1,265 +1,220 @@
 <template>
+  <PersonalitySystem ref="pSystem" @done="savePersonality" />
+
   <div class="playing-game-content-wrapper">
-    <!-- COUNTDOWN OVERLAY -->
-    <div v-if="showCountdown" class="countdown-screen" @click.self.prevent>
+
+    <!-- COUNTDOWN -->
+    <div v-if="showCountdown" class="countdown-screen">
       <div class="countdown-inner">
-        <div class="countdown-number" v-if="countdown > 0">{{ countdown }}</div>
-        <div class="countdown-number go" v-else>GO!</div>
+        <div v-if="countdown > 0" class="countdown-number">
+          {{ countdown }}
+        </div>
+        <div v-else class="countdown-number go">GO!</div>
       </div>
     </div>
 
     <main class="game-content">
+
       <!-- ===== MENU ===== -->
       <section v-if="gameState === 'menu'" class="menu-screen">
-        <h1 class="title">🎮 Mini Games Hub</h1>
+        <h1 class="title">Mini Games Hub</h1>
         <p class="subtitle">Choose a game to play</p>
 
         <div class="menu-grid">
           <button class="menu-card" @click="startGame('vocab')">
-            <div class="card-icon">🐾</div>
-            <h3>Vocabulary Quiz</h3>
-            <p>Jungle themed vocabulary — multiple choice</p>
+            🐾 Vocabulary Quiz
           </button>
 
           <button class="menu-card" @click="startGame('color')">
-            <div class="card-icon">🎨</div>
-            <h3>Color Guess</h3>
-            <p>Type the color name (English / Indonesian)</p>
+            ✍️ Simple Past Tense
           </button>
 
           <button class="menu-card" @click="startGame('logic')">
-            <div class="card-icon">🧠</div>
-            <h3>Logic Puzzle</h3>
-            <p>Solve number / pattern puzzles</p>
+            🧩 Logic Puzzle
           </button>
         </div>
-
-        <footer class="menu-footer">
-          <small>Made for learning — have fun!</small>
-        </footer>
       </section>
 
       <!-- ===== VOCAB QUIZ ===== -->
       <section v-if="gameState === 'vocab'" class="game-screen">
         <header class="game-header">
-          <button class="back-btn" @click="backToMenu">← Back</button>
-          <h2>🐾 Vocabulary Quiz — Jungle</h2>
-          <div class="score">Score: {{ vocabScore }}</div>
+          <button @click="backToMenu">← Back</button>
+          <span>Score: {{ vocabScore }} | ⏱ {{ timeLeft }}s</span>
         </header>
 
-        <div class="quiz-box">
-          <p class="q-index">Question {{ currentVocabIndex + 1 }} / {{ vocabQuestions.length }}</p>
-          <h3 class="q-text">{{ currentVocab.question }}</h3>
-          <p class="clue">Clue: {{ currentVocab.clue }}</p>
+        <p class="q-index">
+          Question {{ currentVocabIndex + 1 }} / {{ vocabQuestions.length }}
+        </p>
 
-          <div class="options-container">
-            <button
-              v-for="(opt, idx) in currentVocab.choices"
-              :key="idx"
-              class="option"
-              :disabled="isSubmitting"
-              @click="answerVocab(idx)"
-            >
-              <span class="opt-label">{{ optionLabel(idx) }}</span>
-              <span class="opt-text">{{ opt }}</span>
-            </button>
-          </div>
+        <h3 class="q-text">{{ currentVocab.question }}</h3>
+        <p class="clue">{{ currentVocab.clue }}</p>
 
-          <p v-if="vocabMessage" class="feedback" :class="vocabMessageType">{{ vocabMessage }}</p>
-
-          <div class="bottom-actions" v-if="vocabFinished">
-            <h4>Quiz Complete!</h4>
-            <p>Your Score: {{ vocabScore }}</p>
-            <div class="action-row">
-              <button class="submit-btn" @click="resetAll">Back to Menu</button>
-              <button class="next-btn" @click="startGame('vocab')">Play Again</button>
-            </div>
-          </div>
+        <div class="options-container">
+          <button
+            v-for="(opt, i) in currentVocab.choices"
+            :key="i"
+            :disabled="isSubmitting"
+            @click="answerVocab(i)"
+          >
+            {{ optionLabel(i) }}. {{ opt }}
+          </button>
         </div>
+
+        <p v-if="vocabMessage" :class="vocabMessageType">
+          {{ vocabMessage }}
+        </p>
       </section>
 
-      <!-- ===== COLOR GUESS ===== -->
+      <!-- ===== GRAMMAR QUIZ ===== -->
       <section v-if="gameState === 'color'" class="game-screen">
         <header class="game-header">
-          <button class="back-btn" @click="backToMenu">← Back</button>
-          <h2>🎨 Color Guess</h2>
-          <div class="score">Score: {{ colorScore }}</div>
+          <button @click="backToMenu">← Back</button>
+          <span>Score: {{ colorScore }} | ⏱ {{ timeLeft }}s</span>
         </header>
 
-        <div class="color-box-area">
-          <div class="color-box" :style="{ backgroundColor: currentColor.code }"></div>
+        <p class="q-index">
+          Question {{ currentGrammarIndex + 1 }} / {{ grammarQuestions.length }}
+        </p>
 
-          <div class="color-controls">
-            <p class="prompt">Type color name (English / Indonesian)</p>
-            <input
-              v-model="colorAnswer"
-              @keyup.enter="checkColorAnswer"
-              class="game-input"
-              placeholder="e.g. blue / biru"
-            />
-            <div class="color-btns">
-              <button class="submit-btn" @click="checkColorAnswer">Check</button>
-              <button class="next-btn" @click="nextColor">Next</button>
-              <button class="skip-btn" @click="endColor">Finish</button>
-            </div>
+        <h3 class="q-text">{{ currentGrammar.question }}</h3>
 
-            <p v-if="colorMessage" class="feedback" :class="colorMessageType">{{ colorMessage }}</p>
-          </div>
+        <div class="options-container">
+          <button
+            v-for="(opt, i) in currentGrammar.choices"
+            :key="i"
+            :disabled="isGrammarSubmitting"
+            @click="answerGrammar(i)"
+          >
+            {{ optionLabel(i) }}. {{ opt }}
+          </button>
         </div>
+
+        <p v-if="grammarMessage" :class="grammarMessageType">
+          {{ grammarMessage }}
+        </p>
       </section>
 
       <!-- ===== LOGIC PUZZLE ===== -->
       <section v-if="gameState === 'logic'" class="game-screen">
         <header class="game-header">
-          <button class="back-btn" @click="backToMenu">← Back</button>
-          <h2>🧩 Logic Puzzle</h2>
-          <div class="score">Score: {{ logicScore }}</div>
+          <button @click="backToMenu">← Back</button>
+          <span>Score: {{ logicScore }} | ⏱ {{ timeLeft }}s</span>
         </header>
 
-        <div class="logic-box">
-          <p class="logic-question">{{ currentLogic.question }}</p>
+        <p class="logic-question">{{ currentLogic.question }}</p>
 
-          <input
-            v-model="logicAnswer"
-            @keyup.enter="checkLogicAnswer"
-            class="game-input"
-            placeholder="Type your answer..."
-          />
+        <input
+          v-model="logicAnswer"
+          class="game-input"
+          placeholder="Type your answer"
+          @keyup.enter="checkLogicAnswer"
+        />
 
-          <div class="code-actions">
-            <button class="submit-btn" @click="checkLogicAnswer">Submit</button>
-            <button class="next-btn" @click="nextLogic">Next</button>
-            <button class="skip-btn" @click="endLogic">Finish</button>
-          </div>
-
-          <p v-if="logicMessage" class="feedback" :class="logicMessageType">{{ logicMessage }}</p>
+        <div class="code-actions">
+          <button @click="checkLogicAnswer">Submit</button>
+          <button @click="nextLogic">Next</button>
         </div>
+
+        <p v-if="logicMessage" :class="logicMessageType">
+          {{ logicMessage }}
+        </p>
       </section>
 
-      
-
-      <!-- ===== GAME OVER / SUMMARY ===== -->
+      <!-- ===== GAME OVER ===== -->
       <section v-if="gameState === 'game_over'" class="menu-screen">
         <h2>🏁 Game Over</h2>
-        <p>Result: {{ lastResult }}</p>
-        <p>Score (vocab): {{ vocabScore }}</p>
-        <p>Score (color): {{ colorScore }}</p>
-        <p>Score (logic): {{ logicScore }}</p>
-        <div class="menu-grid" style="margin-top:1rem;">
-          <button class="menu-card" @click="resetAll">Play Again</button>
-          <button class="menu-card" @click="backToMenu">Back to Menu</button>
-        </div>
+        <p>{{ lastResult }}</p>
+
+        <p>Vocabulary: {{ vocabScore }}</p>
+        <p>Grammar: {{ colorScore }}</p>
+        <p>Logic: {{ logicScore }}</p>
+
+        <button @click="resetAll">Back to Menu</button>
       </section>
+
     </main>
   </div>
 </template>
 
-
-<PersonalitySystem ref="pSystem" @done="savePersonality" />
-
-
-
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed } from 'vue'
 
-/* ===== App state ===== */
-const gameState = ref('menu'); // menu | vocab | color | logic | game_over
+/* ================= STATE ================= */
+const gameState = ref('menu')
 
-/* Countdown overlay */
-const countdown = ref(0);
-const showCountdown = ref(false);
+/* ===== COUNTDOWN ===== */
+const countdown = ref(0)
+const showCountdown = ref(false)
 
-/* helpers for countdown: runs callback when countdown finishes */
+/* ===== TIMER ===== */
+const timeLeft = ref(10)
+let answerTimer = null
+
+function startAnswerTimer(onTimeUp) {
+  clearInterval(answerTimer)
+  timeLeft.value = 10
+  answerTimer = setInterval(() => {
+    timeLeft.value--
+    if (timeLeft.value <= 0) {
+      clearInterval(answerTimer)
+      onTimeUp && onTimeUp()
+    }
+  }, 1000)
+}
+function stopAnswerTimer() {
+  clearInterval(answerTimer)
+}
+
+/* ===== SOUND ===== */
+function playBeep(freq = 500, dur = 0.15, type = 'sine') {
+  const ctx = new AudioContext()
+  const osc = ctx.createOscillator()
+  const gain = ctx.createGain()
+  osc.type = type
+  osc.frequency.value = freq
+  gain.gain.value = 0.15
+  osc.connect(gain)
+  gain.connect(ctx.destination)
+  osc.start()
+  osc.stop(ctx.currentTime + dur)
+}
+const soundCorrect = () => playBeep(800, 0.2, 'square')
+const soundWrong = () => playBeep(200, 0.3, 'sawtooth')
+const soundClick = () => playBeep(350, 0.1)
+const soundCountdown = () => playBeep(300, 0.12)
+
+/* ===== COUNTDOWN START ===== */
 function startCountdown(cb) {
-  showCountdown.value = true;
-  countdown.value = 3;
-
+  showCountdown.value = true
+  countdown.value = 3
   const t = setInterval(() => {
-    soundCountdown(); // tiap angka berbunyi
-    countdown.value--;
-
+    soundCountdown()
+    countdown.value--
     if (countdown.value < 0) {
-      clearInterval(t);
-      showCountdown.value = false;
-
-      playBeep(1000, 0.2); // suara "GO!"
-
-      setTimeout(() => cb && cb(), 120);
+      clearInterval(t)
+      showCountdown.value = false
+      playBeep(1000, 0.2)
+      cb && cb()
     }
-  }, 1000);
+  }, 1000)
 }
 
-
-
-/* ==== SOUND GENERATOR (tanpa file) ==== */
-function playBeep(freq = 500, duration = 0.15, type = "sine") {
-  const ctx = new (window.AudioContext || window.webkitAudioContext)();
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-
-  osc.type = type;
-  osc.frequency.value = freq;
-
-  gain.gain.setValueAtTime(0.15, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
-
-  osc.connect(gain);
-  gain.connect(ctx.destination);
-
-  osc.start();
-  osc.stop(ctx.currentTime + duration);
-}
-
-/* Suara yang berbeda-beda */
-function soundCorrect() {
-  playBeep(750, 0.2, "square"); // suara benar
-}
-
-function soundWrong() {
-  playBeep(180, 0.3, "sawtooth"); // suara salah
-}
-
-function soundClick() {
-  playBeep(350, 0.08, "triangle"); // klik tombol
-}
-
-function soundStart() {
-  playBeep(600, 0.15);
-  setTimeout(() => playBeep(800, 0.15), 150);
-  setTimeout(() => playBeep(1000, 0.15), 300);
-}
-
-function soundCountdown() {
-  playBeep(300, 0.12, "square");
-}
-
-
-/* ===== NAVIGATION ===== */
+/* ===== NAV ===== */
 function startGame(id) {
-  soundClick();
-  soundStart();
+  soundClick()
   startCountdown(() => {
-    if (id === 'vocab') {
-      resetVocab();
-      gameState.value = 'vocab';
-    } else if (id === 'color') {
-      resetColor();
-      gameState.value = 'color';
-    } else if (id === 'logic') {
-      resetLogic();
-      gameState.value = 'logic';
-    }
-  });
+    if (id === 'vocab') resetVocab()
+    if (id === 'color') resetColor()
+    if (id === 'logic') resetLogic()
+    gameState.value = id
+  })
 }
-
 function backToMenu() {
-  // stop everything and return to menu
-  gameState.value = 'menu';
+  stopAnswerTimer()
+  gameState.value = 'menu'
 }
 
-/* ---------------------------
-   VOCAB QUIZ (multiple-choice)
-   --------------------------- */
+/* ================= VOCAB ================= */
 const vocabQuestions = [
   {
     question: "What is the meaning of 'jungle'?",
@@ -426,234 +381,254 @@ const vocabQuestions = [
     ],
     answerIndex: 1
   }
-];
+]
 
+const currentVocabIndex = ref(0)
+const vocabScore = ref(0)
+const vocabMessage = ref('')
+const vocabMessageType = ref('')
+const isSubmitting = ref(false)
 
-const currentVocabIndex = ref(0);
-const vocabScore = ref(0);
-const isSubmitting = ref(false);
-const vocabMessage = ref('');
-const vocabMessageType = ref('');
+const currentVocab = computed(() => vocabQuestions[currentVocabIndex.value])
 
-const currentVocab = computed(() => {
-  return vocabQuestions[currentVocabIndex.value] || { choices: [] };
-});
-
-const vocabFinished = computed(() => currentVocabIndex.value >= vocabQuestions.length);
-
-function optionLabel(idx) {
-  return String.fromCharCode(65 + idx);
+function optionLabel(i) {
+  return String.fromCharCode(65 + i)
 }
 
 function resetVocab() {
-  currentVocabIndex.value = 0;
-  vocabScore.value = 0;
-  vocabMessage.value = '';
-  vocabMessageType.value = '';
-  isSubmitting.value = false;
+  currentVocabIndex.value = 0
+  vocabScore.value = 0
+  startAnswerTimer(() => nextVocab())
 }
 
-function answerVocab(idx) {
-  if (isSubmitting.value) return;
-  isSubmitting.value = true;
+function answerVocab(i) {
+  stopAnswerTimer()
+  if (isSubmitting.value) return
+  isSubmitting.value = true
 
-  const correct = currentVocab.value.answerIndex;
-  if (idx === correct) {
-    soundCorrect();
-    vocabScore.value += 10;
-    vocabMessage.value = 'Correct!';
-    vocabMessageType.value = 'success';
+  if (i === currentVocab.value.answerIndex) {
+    vocabScore.value += 10
+    soundCorrect()
+    vocabMessage.value = 'Correct!'
+    vocabMessageType.value = 'success'
   } else {
-    soundWrong();
-    vocabMessage.value = 'Wrong answer.';
-    vocabMessageType.value = 'error';
+    soundWrong()
+    vocabMessage.value = 'Wrong!'
+    vocabMessageType.value = 'error'
   }
 
   setTimeout(() => {
-    vocabMessage.value = '';
-    isSubmitting.value = false;
-    if (currentVocabIndex.value < vocabQuestions.length - 1) {
-      currentVocabIndex.value++;
-    } else {
-      // finished
-      lastResult.value = 'Completed Vocabulary Quiz';
-      gameState.value = 'game_over';
-    }
-  }, 700);
+    vocabMessage.value = ''
+    isSubmitting.value = false
+    nextVocab()
+  }, 700)
+}
+
+function nextVocab() {
+  if (currentVocabIndex.value < vocabQuestions.length - 1) {
+    currentVocabIndex.value++
+    startAnswerTimer(() => nextVocab())
+  } else {
+    lastResult.value = 'Vocabulary Quiz Completed'
+    gameState.value = 'game_over'
+  }
 }
 
 /* ---------------------------
-   COLOR GUESS
-   --------------------------- */
-const colors = [
-  { code: 'red', en: 'red', id: 'merah' },
-  { code: 'blue', en: 'blue', id: 'biru' },
-  { code: 'green', en: 'green', id: 'hijau' },
-  { code: 'yellow', en: 'yellow', id: 'kuning' },
-  { code: 'purple', en: 'purple', id: 'ungu' },
-  { code: 'black', en: 'black', id: 'hitam' },
-  { code: 'white', en: 'white', id: 'putih' },
-  { code: 'orange', en: 'orange', id: 'oranye' }
-];
+   GRAMMAR QUIZ – SIMPLE PAST
+--------------------------- */
 
-const currentColor = ref(colors[0]);
-const colorAnswer = ref('');
-const colorMessage = ref('');
-const colorMessageType = ref('');
-const colorScore = ref(0);
+const grammarQuestions = [
+  {
+    question: "Yesterday, I ___ (go) to the market with my mom.",
+    choices: ["go", "goed", "went", "gone"],
+    answerIndex: 2
+  },
+  {
+    question: "She ___ (eat) noodles for breakfast this morning.",
+    choices: ["eat", "eated", "ate", "eaten"],
+    answerIndex: 2
+  },
+  {
+    question: "We ___ (see) a beautiful rainbow after the rain.",
+    choices: ["see", "saw", "seen", "seed"],
+    answerIndex: 1
+  },
+  {
+    question: "My father ___ (buy) a new helmet last week.",
+    choices: ["buy", "buyed", "bought", "buys"],
+    answerIndex: 2
+  },
+  {
+    question: "They ___ (make) a cake for the school event.",
+    choices: ["make", "made", "maked", "making"],
+    answerIndex: 1
+  },
+  {
+    question: "I ___ (bring) my laptop to class yesterday.",
+    choices: ["bring", "brought", "bringed", "brung"],
+    answerIndex: 1
+  },
+  {
+    question: "He ___ (speak) English during the presentation.",
+    choices: ["speak", "spoke", "speaked", "spoken"],
+    answerIndex: 1
+  },
+  {
+    question: "Tasya ___ (write) a letter to her friend.",
+    choices: ["write", "wrote", "written", "writed"],
+    answerIndex: 1
+  },
+  {
+    question: "The students ___ (take) many photos during the trip.",
+    choices: ["take", "taken", "taked", "took"],
+    answerIndex: 3
+  },
+  {
+    question: "My cousin ___ (come) to my house last night.",
+    choices: ["come", "comed", "came", "comes"],
+    answerIndex: 2
+  }
+]
 
-/* choose random color; ensure not identical to current to avoid immediate repeats */
-function pickRandomColorAvoidSame() {
-  if (colors.length === 1) return colors[0];
-  let candidate;
-  let tries = 0;
-  do {
-    candidate = colors[Math.floor(Math.random() * colors.length)];
-    tries++;
-  } while (candidate.code === currentColor.value.code && tries < 8);
-  return candidate;
-}
+const currentGrammarIndex = ref(0)
+const colorScore = ref(0)
+const grammarMessage = ref('')
+const grammarMessageType = ref('')
+const isGrammarSubmitting = ref(false)
+
+const currentGrammar = computed(() => grammarQuestions[currentGrammarIndex.value])
 
 function resetColor() {
-  currentColor.value = pickRandomColorAvoidSame();
-  colorAnswer.value = '';
-  colorMessage.value = '';
-  colorScore.value = 0;
+  currentGrammarIndex.value = 0
+  colorScore.value = 0
+  startAnswerTimer(() => nextGrammar())
 }
 
-function checkColorAnswer() {
-  const user = (colorAnswer.value || '').trim().toLowerCase();
-  if (!user) {
-    colorMessage.value = 'Please type a color.';
-    colorMessageType.value = 'error';
-    return;
-  }
-  if (user === currentColor.value.en || user === currentColor.value.id) {
-    soundCorrect();
-    colorMessage.value = 'Correct!';
-    colorMessageType.value = 'success';
-    colorScore.value += 5;
+function answerGrammar(i) {
+  stopAnswerTimer()
+  if (isGrammarSubmitting.value) return
+  isGrammarSubmitting.value = true
+
+  if (i === currentGrammar.value.answerIndex) {
+    colorScore.value += 10
+    soundCorrect()
+    grammarMessage.value = 'Correct!'
+    grammarMessageType.value = 'success'
   } else {
-    soundWrong();
-    colorMessage.value = `Wrong — correct is "${currentColor.value.en}" / "${currentColor.value.id}"`;
-    colorMessageType.value = 'error';
+    soundWrong()
+    grammarMessage.value = 'Wrong!'
+    grammarMessageType.value = 'error'
+  }
+
+  setTimeout(() => {
+    grammarMessage.value = ''
+    isGrammarSubmitting.value = false
+    nextGrammar()
+  }, 700)
+}
+
+function nextGrammar() {
+  if (currentGrammarIndex.value < grammarQuestions.length - 1) {
+    currentGrammarIndex.value++
+    startAnswerTimer(() => nextGrammar())
+  } else {
+    lastResult.value = 'Grammar Quiz Completed'
+    gameState.value = 'game_over'
   }
 }
 
-function nextColor() {
-  // choose new color different from current
-  currentColor.value = pickRandomColorAvoidSame();
-  colorAnswer.value = '';
-  colorMessage.value = '';
-}
-
-function endColor() {
-  // finish color game and summarize
-  lastResult.value = 'Finished Color Guess';
-  gameState.value = 'game_over';
-}
-
-/* ---------------------------
-   LOGIC PUZZLE
-   --------------------------- */
+/* ================= LOGIC ================= */
 const logicQuestions = [
-  { question: '2, 4, 6, 8, ... ? (next number)', answer: '10' },
-  { question: '5 + 3 × 2 = ? (Use operator precedence)', answer: '11' },
-  { question: '10, 20, 40, 80, ... ? (next number)', answer: '160' },
-  { question: 'TRUE or FALSE: 8 > 12 ?', answer: 'false' },
-  { question: '3, 9, 27, 81, ... ? (next number)', answer: '243' }
-];
+  // WORD SCRAMBLE (1–10)
+  { question: 'Unscramble: JREOPTOCR', answer: 'projector' },
+  { question: 'Unscramble: BRECOLDIPA', answer: 'clipboard' },
+  { question: 'Unscramble: GHHLIRETGI', answer: 'highlighter' },
+  { question: 'Unscramble: PRETACSOLRO', answer: 'protractor' },
+  { question: 'Unscramble: CLIPDBRINE', answer: 'binderclip' },
+  { question: 'Unscramble: EWROTHIBAD', answer: 'whiteboard' },
+  { question: 'Unscramble: MPAOSCS', answer: 'compass' },
+  { question: 'Unscramble: RTAKEM', answer: 'marker' },
+  { question: 'Unscramble: OBKNOTEO', answer: 'notebook' },
+  { question: 'Unscramble: TLNIAMARO', answer: 'laminator' },
 
-const currentLogicIndex = ref(0);
-const logicAnswer = ref('');
-const logicMessage = ref('');
-const logicMessageType = ref('');
-const logicScore = ref(0);
+  // RIDDLE PUZZLE (11–20)
+  { question: 'I help you draw perfect circles. What am I?', answer: 'compass' },
+  { question: 'You use me to highlight important information. Who am I?', answer: 'highlighter' },
+  { question: 'I hold pieces of paper together without glue. What am I?', answer: 'binderclip' },
+  { question: 'Teachers point at the screen using my red light. Who am I?', answer: 'laser pointer' },
+  { question: 'You write on me using markers, not chalk. What am I?', answer: 'whiteboard' },
+  { question: 'I can punch holes in paper. Who am I?', answer: 'hole puncher' },
+  { question: 'I protect paper with a plastic layer. Who am I?', answer: 'laminator' },
+  { question: 'Students write notes in me. Who am I?', answer: 'notebook' },
+  { question: 'I keep papers neat on a table. What am I?', answer: 'document tray' },
+  { question: 'I erase pencil marks. Who am I?', answer: 'eraser' }
+]
 
-const currentLogic = computed(() => logicQuestions[currentLogicIndex.value] || { question: '', answer: '' });
+const currentLogicIndex = ref(0)
+const logicAnswer = ref('')
+const logicMessage = ref('')
+const logicMessageType = ref('')
+const logicScore = ref(0)
+
+const currentLogic = computed(() => logicQuestions[currentLogicIndex.value])
 
 function resetLogic() {
-  currentLogicIndex.value = 0;
-  logicAnswer.value = '';
-  logicMessage.value = '';
-  logicScore.value = 0;
+  currentLogicIndex.value = 0
+  logicScore.value = 0
+  startAnswerTimer(() => soundWrong())
 }
 
 function checkLogicAnswer() {
-  const user = (logicAnswer.value || '').trim().toLowerCase();
-  const correct = (currentLogic.value.answer || '').toLowerCase();
-  if (!user) {
-    logicMessage.value = 'Please enter an answer.';
-    logicMessageType.value = 'error';
-    return;
-  }
-  if (user === correct) {
-    soundCorrect();
-    logicMessage.value = 'Correct!';
-    logicMessageType.value = 'success';
-    logicScore.value += 5;
+  stopAnswerTimer()
+  if (logicAnswer.value.toLowerCase() === currentLogic.value.answer) {
+    logicScore.value += 5
+    soundCorrect()
+    logicMessage.value = 'Correct!'
+    logicMessageType.value = 'success'
   } else {
-    soundWrong();
-    logicMessage.value = `Wrong — correct: ${currentLogic.value.answer}`;
-    logicMessageType.value = 'error';
+    soundWrong()
+    logicMessage.value = `Wrong: ${currentLogic.value.answer}`
+    logicMessageType.value = 'error'
   }
 }
 
 function nextLogic() {
-  logicAnswer.value = '';
-  logicMessage.value = '';
+  logicAnswer.value = ''
+  logicMessage.value = ''
   if (currentLogicIndex.value < logicQuestions.length - 1) {
-    currentLogicIndex.value++;
+    currentLogicIndex.value++
+    startAnswerTimer(() => {})
   } else {
-    lastResult.value = 'Finished Logic Puzzles';
-    gameState.value = 'game_over';
+    lastResult.value = 'Logic Puzzle Completed'
+    gameState.value = 'game_over'
   }
 }
 
-function endLogic() {
-  lastResult.value = 'Ended Logic Puzzles';
-  gameState.value = 'game_over';
-}
-
-/* ---------------------------
-   GAME OVER / UTIL
-   --------------------------- */
-const lastResult = ref('');
-
-function gameOverLocal(reason) {
-  lastResult.value = reason || 'Game Over';
-  gameState.value = 'game_over';
-}
+/* ================= GAME OVER ================= */
+const lastResult = ref('')
 
 function resetAll() {
-  resetVocab();
-  resetColor();
-  resetLogic();
-  gameState.value = 'menu';
+  stopAnswerTimer()
+  gameState.value = 'menu'
 }
-
-/* ---------------------------
-   INIT
-   --------------------------- */
-onMounted(() => {
-  // initial seeds
-  currentColor.value = colors[Math.floor(Math.random() * colors.length)];
-});
 </script>
+
 
 <style scoped>
 /* ---- Theme ---- */
 :root {
-  --bg: #0b0b0b;
-  --panel: #91b49a;
-  --accent: #22ff88;
-  --accent-soft: rgba(185, 206, 195, 0.22);
-  --muted: #9aa0a6;
-  --glass: rgba(255,255,255,0.06);
+  --bg: #050b18;
+  --panel: #3bbcff;
+  --accent: #1e6bff;
+  --accent-soft: rgba(30, 107, 255, 0.25);
+  --muted: #9fb6ff;
+  --glass: rgba(255,255,255,0.08);
   --radius: 14px;
-  --card-bg: rgba(255,255,255,0.04);
+  --card-bg: rgba(255,255,255,0.06);
   --transition: 0.22s cubic-bezier(.25,.46,.45,.94);
 }
+
 
 /* ===== FIX CARD VISIBILITY ===== */
 .menu-card {
@@ -664,7 +639,7 @@ onMounted(() => {
 
 /* Hover lebih bersih */
 .menu-card:hover {
-  background: rgba(142, 170, 156, 0.12);
+  background: rgba(19, 3, 247, 0.12);
   border-color: var(--accent);
   transform: translateY(-6px) scale(1.02);
 }
@@ -674,7 +649,7 @@ onMounted(() => {
   color: #ffffff;
   font-size: 2.8rem;
   font-weight: 800;
-  text-shadow: 0 0 12px rgba(187, 199, 193, 0.35);
+  text-shadow: 0 0 12px rgba(6, 26, 247, 0.35);
 }
 
 .subtitle {
@@ -732,16 +707,22 @@ onMounted(() => {
 
 
 /* ---- Main Wrapper ---- */
+/* ---- Main Wrapper ---- */
 .playing-game-content-wrapper {
   min-height: 100vh;
-  background: radial-gradient(circle at 20% 20%, #0f2e21 0%, #06130b 100%);
-  color: #e9fff0;
+  background: radial-gradient(
+    circle at 20% 20%,
+    #0b2a6f 0%,
+    #040a1a 100%
+  );
+  color: #eaf2ff;
   font-family: Inter, system-ui, "Segoe UI", Roboto, Arial;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 48px 20px;
 }
+
 
 /* ---- Countdown Overlay ---- */
 .countdown-screen {
@@ -778,12 +759,20 @@ onMounted(() => {
   width: 100%;
   max-width: 980px;
   backdrop-filter: blur(12px);
+
+  /* === TAMBAHAN (visual saja) === */
+  background: rgba(255, 255, 255, 0.06); /* lebih muda dari background */
+  border-radius: 18px;
+  padding: 48px 36px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
 }
 
 /* ---- Menu ---- */
 .menu-screen {
   text-align: center;
 }
+
 
 .title {
   font-size: 2.6rem;
@@ -861,7 +850,7 @@ onMounted(() => {
 
 .back-btn:hover {
   border-color: var(--accent);
-  background: rgba(154, 187, 168, 0.08);
+  background: rgba(0, 59, 251, 0.08);
 }
 
 .score {
@@ -921,9 +910,9 @@ onMounted(() => {
 
 .option:hover {
   transform: translateY(-6px);
-  background: rgba(233, 248, 240, 0.1);
+  background: rgba(2, 2, 52, 0.1);
   border-color: var(--accent);
-  color: #3f5645;
+  color: #0151ff;
 }
 
 .opt-label {
@@ -946,7 +935,7 @@ onMounted(() => {
 .game-input:focus {
   outline: none;
   border-color: var(--accent);
-  background: rgba(233, 255, 243, 0.08);
+  background: rgba(2, 25, 83, 0.08);
 }
 
 .code-actions, .color-btns {
@@ -966,7 +955,7 @@ onMounted(() => {
 
 .submit-btn {
   background: var(--accent);
-  color: #8fd58f;
+  color: #021ffd;
 }
 
 .submit-btn:hover {
@@ -994,7 +983,7 @@ onMounted(() => {
 }
 
 .feedback.success {
-  background: rgba(44, 221, 126, 0.12);
+  background: rgba(3, 44, 250, 0.12);
   color: var(--accent);
   border: 1px solid var(--accent-soft);
 }

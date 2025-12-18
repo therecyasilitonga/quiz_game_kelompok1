@@ -2,7 +2,7 @@
   <div class="register-container">
     <main class="main-content">
       <div class="form-card">
-        <h1>Selamat datang di laman Register EBT Game</h1>
+        <h1>Selamat datang di laman Register FUN VOCABULARY LEARNING QUIZ Game</h1>
         <p class="tagline">ayo bermain sambil belajar!</p>
         <form @submit.prevent="handleRegister" class="register-form">
           <div class="form-group">
@@ -150,15 +150,17 @@ const handleRegister = async () => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+/* ===== BACKGROUND UTAMA (BIRU GRADASI) ===== */
 .register-container {
-  background-color: #111;
-  color: #fff;
+  background: linear-gradient(135deg, #0a1f44, #0f3c91, #1e90ff);
+  color: #ffffff;
   font-family: 'Press Start 2P', monospace;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
 
+/* ===== KONTEN ===== */
 .main-content {
   flex: 1;
   display: flex;
@@ -167,15 +169,16 @@ const handleRegister = async () => {
   padding: 2rem 1rem;
 }
 
+/* ===== CARD FORM ===== */
 .form-card {
-  background-color: #222;
-  border: 2px solid #0f0;
+  background: linear-gradient(160deg, #0b1d3a, #122b55);
+  border: 2px solid #4da3ff;
   padding: 2.5rem 2rem;
   border-radius: 12px;
   text-align: center;
-  width: 95%;         /* Lebih lebar dari sebelumnya */
-  max-width: 1100px;  /* Maksimal lebih panjang */
-  box-shadow: 0 0 20px rgba(0, 255, 0, 0.7);
+  width: 95%;
+  max-width: 1100px;
+  box-shadow: 0 0 25px rgba(77, 163, 255, 0.6);
   transition: transform 0.3s ease-in-out;
 }
 
@@ -183,19 +186,21 @@ const handleRegister = async () => {
   transform: translateY(-5px);
 }
 
+/* ===== JUDUL ===== */
 .form-card h1 {
   font-size: 1.5rem;
   margin-bottom: 1.2rem;
-  color: #0f0;
-  text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+  color: #4da3ff;
+  text-shadow: 0 0 6px rgba(77, 163, 255, 0.8);
 }
 
 .form-card .tagline {
   font-size: 0.9rem;
   margin-bottom: 2rem;
-  color: #aaa;
+  color: #cbdcff;
 }
 
+/* ===== FORM ===== */
 .register-form {
   display: flex;
   flex-direction: column;
@@ -210,15 +215,16 @@ const handleRegister = async () => {
   display: block;
   margin-bottom: 0.6rem;
   font-size: 0.9rem;
-  color: #fff;
+  color: #ffffff;
 }
 
+/* ===== INPUT ===== */
 .form-group input {
   width: 100%;
   padding: 0.85rem 10px;
-  border: 2px solid #0f0;
-  background-color: #333;
-  color: #fff;
+  border: 2px solid #4da3ff;
+  background-color: #0b1d3a;
+  color: #ffffff;
   font-family: 'Press Start 2P', monospace;
   border-radius: 6px;
   font-size: 0.9rem;
@@ -227,34 +233,35 @@ const handleRegister = async () => {
 
 .form-group input:focus {
   outline: none;
-  border-color: #0a0;
-  box-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+  border-color: #1e90ff;
+  box-shadow: 0 0 12px rgba(30, 144, 255, 0.8);
 }
 
 .form-group input::placeholder {
-  color: #bbb;
+  color: #b0cfff;
   opacity: 0.7;
 }
 
+/* ===== BUTTON ===== */
 .submit-button {
-  background-color: #0f0;
-  color: #111;
+  background: linear-gradient(135deg, #4da3ff, #1e90ff);
+  color: #0a1f44;
   border: none;
   padding: 1.2rem;
   font-family: 'Press Start 2P', monospace;
   cursor: pointer;
   border-radius: 8px;
   font-size: 1.1rem;
-  transition: background-color 0.3s, color 0.3s, transform 0.2s, box-shadow 0.3s;
+  transition: all 0.3s ease;
   margin-top: 1.5rem;
-  box-shadow: 0 5px 15px rgba(0, 255, 0, 0.4);
+  box-shadow: 0 6px 18px rgba(77, 163, 255, 0.6);
 }
 
 .submit-button:hover:not(:disabled) {
-  background-color: #0a0;
-  color: #fff;
+  background: linear-gradient(135deg, #1e90ff, #007bff);
+  color: #ffffff;
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 255, 0, 0.6);
+  box-shadow: 0 10px 25px rgba(30, 144, 255, 0.8);
 }
 
 .submit-button:disabled {
@@ -264,12 +271,13 @@ const handleRegister = async () => {
   opacity: 0.6;
 }
 
+/* ===== MESSAGE ===== */
 .error-message {
   margin-top: 1rem;
   font-size: 0.85rem;
-  color: #f00;
-  background-color: rgba(255, 0, 0, 0.15);
-  border: 1px solid #f00;
+  color: #ff4d4d;
+  background-color: rgba(255, 77, 77, 0.15);
+  border: 1px solid #ff4d4d;
   padding: 0.75rem;
   border-radius: 6px;
 }
@@ -277,30 +285,32 @@ const handleRegister = async () => {
 .success-message {
   margin-top: 1rem;
   font-size: 0.85rem;
-  color: #0f0;
-  background-color: rgba(0, 255, 0, 0.15);
-  border: 1px solid #0f0;
+  color: #4da3ff;
+  background-color: rgba(77, 163, 255, 0.15);
+  border: 1px solid #4da3ff;
   padding: 0.75rem;
   border-radius: 6px;
 }
 
+/* ===== LINK LOGIN ===== */
 .login-link {
   margin-top: 2rem;
   font-size: 0.85rem;
-  color: #aaa;
+  color: #cbdcff;
 }
 
 .login-link a {
-  color: #0f0;
+  color: #4da3ff;
   text-decoration: none;
   transition: color 0.3s, text-decoration 0.3s;
 }
 
 .login-link a:hover {
-  color: #0a0;
+  color: #1e90ff;
   text-decoration: underline;
 }
 
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .form-card {
     width: 95%;

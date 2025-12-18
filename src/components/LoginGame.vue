@@ -77,9 +77,20 @@ const handleLogin = async () => {
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+/* ===== ROOT WARNA ===== */
+:root {
+  --neon-blue: #4da3ff;
+  --dark-blue: #1e90ff;
+  --deep-blue: #0a1f44;
+  --bg-gradient: linear-gradient(135deg, #0a1f44, #0f3c91, #1e90ff);
+  --card-bg: linear-gradient(160deg, #0b1d3a, #122b55);
+  --input-bg: #0b1d3a;
+}
+
+/* ===== WRAPPER ===== */
 .login-content-wrapper {
-  background-color: #111;
-  color: #fff;
+  background: var(--bg-gradient);
+  color: #eaf2ff;
   font-family: 'Press Start 2P', monospace;
   min-height: calc(100vh - var(--navbar-height, 0px) - var(--footer-height, 0px));
   display: flex;
@@ -87,6 +98,7 @@ const handleLogin = async () => {
   flex: 1;
 }
 
+/* ===== MAIN ===== */
 .main-content {
   flex: 1;
   display: flex;
@@ -95,15 +107,18 @@ const handleLogin = async () => {
   padding: 2rem 1rem;
 }
 
+/* ===== CARD ===== */
 .form-card {
-  background-color: #222;
-  border: 2px solid #0f0;
+  background: var(--card-bg);
+  border: 2px solid var(--neon-blue);
   padding: 2.5rem;
   border-radius: 12px;
   text-align: center;
-  width: 95%;          /* Lebih panjang */
-  max-width: 1000px;   /* Maksimal lebih lebar */
-  box-shadow: 0 0 20px rgba(0, 255, 0, 0.7);
+  width: 95%;
+  max-width: 1000px;
+  box-shadow:
+    0 0 20px rgba(77,163,255,0.7),
+    0 0 35px rgba(77,163,255,0.4);
   transition: transform 0.3s ease-in-out;
 }
 
@@ -111,19 +126,21 @@ const handleLogin = async () => {
   transform: translateY(-5px);
 }
 
+/* ===== TITLE ===== */
 .form-card h1 {
   font-size: 1.5rem;
   margin-bottom: 1.2rem;
-  color: #0f0;
-  text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+  color: var(--neon-blue);
+  text-shadow: 0 0 8px rgba(77,163,255,0.8);
 }
 
 .form-card .tagline {
   font-size: 0.9rem;
   margin-bottom: 2rem;
-  color: #aaa;
+  color: #cbdcff;
 }
 
+/* ===== FORM ===== */
 .login-form {
   display: flex;
   flex-direction: column;
@@ -135,18 +152,18 @@ const handleLogin = async () => {
 }
 
 .form-group label {
-  display: block;
   margin-bottom: 0.6rem;
   font-size: 0.9rem;
-  color: #fff;
+  color: #ffffff;
 }
 
+/* ===== INPUT ===== */
 .form-group input {
   width: 100%;
   padding: 0.85rem 10px;
-  border: 2px solid #0f0;
-  background-color: #333;
-  color: #fff;
+  border: 2px solid var(--neon-blue);
+  background-color: var(--input-bg);
+  color: #ffffff;
   font-family: 'Press Start 2P', monospace;
   border-radius: 6px;
   font-size: 0.9rem;
@@ -155,38 +172,42 @@ const handleLogin = async () => {
 
 .form-group input:focus {
   outline: none;
-  border-color: #0a0;
-  box-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+  border-color: var(--dark-blue);
+  box-shadow: 0 0 12px rgba(77,163,255,0.8);
 }
 
 .form-group input::placeholder {
-  color: #bbb;
+  color: #9fbfff;
   opacity: 0.7;
 }
 
+/* ===== BUTTON ===== */
 .submit-button {
-  background-color: #0f0;
-  color: #111;
+  background: linear-gradient(135deg, var(--neon-blue), var(--dark-blue));
+  color: var(--deep-blue);
   border: none;
   padding: 1.2rem;
   font-family: 'Press Start 2P', monospace;
   cursor: pointer;
   border-radius: 8px;
   font-size: 1.1rem;
-  transition: background-color 0.3s, color 0.3s, transform 0.2s, box-shadow 0.3s;
+  transition: all 0.3s ease;
   margin-top: 1.5rem;
-  box-shadow: 0 5px 15px rgba(0, 255, 0, 0.4);
+  box-shadow:
+    0 0 15px var(--neon-blue),
+    0 0 30px var(--neon-blue);
 }
 
 .submit-button:hover:not(:disabled) {
-  background-color: #0a0;
-  color: #fff;
+  color: #ffffff;
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 255, 0, 0.6);
+  box-shadow:
+    0 0 20px var(--neon-blue),
+    0 0 40px var(--neon-blue);
 }
 
 .submit-button:disabled {
-  background-color: #555;
+  background: #555;
   color: #aaa;
   cursor: not-allowed;
   opacity: 0.6;
@@ -194,94 +215,58 @@ const handleLogin = async () => {
   transform: none;
 }
 
+/* ===== ERROR ===== */
 .error-message {
   margin-top: 1rem;
   font-size: 0.85rem;
-  color: #f00;
-  background-color: rgba(255, 0, 0, 0.15);
-  border: 1px solid #f00;
+  color: #ff4d4d;
+  background-color: rgba(255, 77, 77, 0.15);
+  border: 1px solid #ff4d4d;
   padding: 0.75rem;
   border-radius: 6px;
 }
 
-.forgot-password-link {
+/* ===== LINKS ===== */
+.forgot-password-link,
+.register-link {
   margin-top: 1rem;
-  font-size: 0.75rem;
-  color: #aaa;
-}
-
-.forgot-password-link a {
-  color: #0f0;
-  text-decoration: none;
-  transition: color 0.3s;
-}
-
-.forgot-password-link a:hover {
-  color: #0a0;
-  text-decoration: underline;
+  font-size: 0.8rem;
+  color: #cbdcff;
 }
 
 .register-link {
   margin-top: 2rem;
-  font-size: 0.85rem;
-  color: #aaa;
 }
 
+.forgot-password-link a,
 .register-link a {
-  color: #0f0;
+  color: var(--neon-blue);
   text-decoration: none;
   transition: color 0.3s, text-decoration 0.3s;
 }
 
+.forgot-password-link a:hover,
 .register-link a:hover {
-  color: #0a0;
+  color: var(--dark-blue);
   text-decoration: underline;
 }
 
-/* Responsive adjustments */
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .form-card {
-    width: 95%;
     padding: 2rem;
   }
   .form-card h1 {
     font-size: 1.3rem;
   }
-  .form-card .tagline {
-    font-size: 0.8rem;
-  }
-  .form-group label,
-  .form-group input,
-  .submit-button,
-  .register-link,
-  .error-message {
-    font-size: 0.8rem;
-  }
-  .submit-button {
-    padding: 1rem;
-  }
 }
 
 @media (max-width: 480px) {
   .form-card {
-    width: 95%;
     padding: 1.5rem;
   }
   .form-card h1 {
     font-size: 1.1rem;
-  }
-  .form-card .tagline {
-    font-size: 0.7rem;
-  }
-  .form-group label,
-  .form-group input,
-  .submit-button,
-  .register-link,
-  .error-message {
-    font-size: 0.7rem;
-  }
-  .submit-button {
-    padding: 0.8rem;
   }
 }
 </style>

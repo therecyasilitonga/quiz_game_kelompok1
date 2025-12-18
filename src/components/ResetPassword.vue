@@ -140,7 +140,6 @@ const handleSetNewPassword = async () => {
 </script>
 
 <style scoped>
-/* Gunakan kembali gaya dari Login/Register untuk konsistensi */
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 .reset-password-container {
@@ -148,8 +147,8 @@ const handleSetNewPassword = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #111;
-  color: #fff;
+  background-color: #0a1f44;
+  color: #eaf2ff;
   font-family: 'Press Start 2P', monospace;
   flex: 1;
 }
@@ -163,14 +162,14 @@ const handleSetNewPassword = async () => {
 }
 
 .form-card {
-  background-color: #222;
-  border: 2px solid #0f0;
+  background-color: #122b55;
+  border: 2px solid #4da3ff;
   padding: 2.5rem;
   border-radius: 12px;
   text-align: center;
   max-width: 450px;
   width: 100%;
-  box-shadow: 0 0 20px rgba(0, 255, 0, 0.7);
+  box-shadow: 0 0 20px rgba(77, 163, 255, 0.7);
   transition: transform 0.3s ease-in-out;
 }
 
@@ -181,14 +180,14 @@ const handleSetNewPassword = async () => {
 .form-card h1 {
   font-size: 1.5rem;
   margin-bottom: 1.2rem;
-  color: #0f0;
-  text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+  color: #4da3ff;
+  text-shadow: 0 0 5px rgba(77, 163, 255, 0.5);
 }
 
 .form-card .tagline {
   font-size: 0.9rem;
   margin-bottom: 2rem;
-  color: #aaa;
+  color: #cbdcff;
 }
 
 .reset-form {
@@ -205,15 +204,15 @@ const handleSetNewPassword = async () => {
   display: block;
   margin-bottom: 0.6rem;
   font-size: 0.9rem;
-  color: #fff;
+  color: #eaf2ff;
 }
 
 .form-group input {
   width: calc(100% - 20px);
   padding: 0.85rem 10px;
-  border: 2px solid #0f0;
-  background-color: #333;
-  color: #fff;
+  border: 2px solid #4da3ff;
+  background-color: #0b1d3a;
+  color: #eaf2ff;
   font-family: 'Press Start 2P', monospace;
   border-radius: 6px;
   font-size: 0.9rem;
@@ -222,18 +221,18 @@ const handleSetNewPassword = async () => {
 
 .form-group input:focus {
   outline: none;
-  border-color: #0a0;
-  box-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
+  border-color: #1e90ff;
+  box-shadow: 0 0 10px rgba(77, 163, 255, 0.7);
 }
 
 .form-group input::placeholder {
-  color: #bbb;
+  color: #9fbfff;
   opacity: 0.7;
 }
 
 .submit-button {
-  background-color: #0f0;
-  color: #111;
+  background-color: #4da3ff;
+  color: #0a1f44;
   border: none;
   padding: 1.2rem;
   font-family: 'Press Start 2P', monospace;
@@ -242,31 +241,31 @@ const handleSetNewPassword = async () => {
   font-size: 1.1rem;
   transition: background-color 0.3s, color 0.3s, transform 0.2s, box-shadow 0.3s;
   margin-top: 1.5rem;
-  box-shadow: 0 5px 15px rgba(0, 255, 0, 0.4);
+  box-shadow: 0 5px 15px rgba(77, 163, 255, 0.4);
 }
 
 .submit-button:hover:not(:disabled) {
-  background-color: #0a0;
-  color: #fff;
+  background-color: #1e90ff;
+  color: #eaf2ff;
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 255, 0, 0.6);
+  box-shadow: 0 8px 20px rgba(77, 163, 255, 0.6);
 }
 
 .submit-button:disabled {
-    background-color: #555;
-    color: #aaa;
-    cursor: not-allowed;
-    opacity: 0.6;
-    box-shadow: none;
-    transform: none;
+  background-color: #555;
+  color: #aaa;
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
+  transform: none;
 }
 
 .error-message {
   margin-top: 1rem;
   font-size: 0.85rem;
-  color: #f00;
-  background-color: rgba(255, 0, 0, 0.15);
-  border: 1px solid #f00;
+  color: #ff4d4d;
+  background-color: rgba(255, 77, 77, 0.15);
+  border: 1px solid #ff4d4d;
   padding: 0.75rem;
   border-radius: 6px;
 }
@@ -274,9 +273,9 @@ const handleSetNewPassword = async () => {
 .success-message {
   margin-top: 1rem;
   font-size: 0.85rem;
-  color: #0f0;
-  background-color: rgba(0, 255, 0, 0.15);
-  border: 1px solid #0f0;
+  color: #4da3ff;
+  background-color: rgba(77, 163, 255, 0.15);
+  border: 1px solid #4da3ff;
   padding: 0.75rem;
   border-radius: 6px;
 }
@@ -284,65 +283,44 @@ const handleSetNewPassword = async () => {
 .back-to-login {
   margin-top: 2rem;
   font-size: 0.85rem;
-  color: #aaa;
+  color: #cbdcff;
 }
 
 .back-to-login a {
-  color: #0f0;
+  color: #4da3ff;
   text-decoration: none;
   transition: color 0.3s, text-decoration 0.3s;
 }
 
 .back-to-login a:hover {
-  color: #0a0;
+  color: #1e90ff;
   text-decoration: underline;
 }
 
-/* Responsive adjustments */
+/* RESPONSIVE — TIDAK DIUBAH */
 @media (max-width: 768px) {
-  .form-card {
-    padding: 2rem;
-    max-width: 90%;
-  }
-  .form-card h1 {
-    font-size: 1.3rem;
-  }
-  .form-card .tagline {
-    font-size: 0.8rem;
-  }
+  .form-card { padding: 2rem; max-width: 90%; }
+  .form-card h1 { font-size: 1.3rem; }
+  .form-card .tagline { font-size: 0.8rem; }
   .form-group label,
   .form-group input,
   .submit-button,
   .back-to-login,
   .error-message,
-  .success-message {
-    font-size: 0.8rem;
-  }
-  .submit-button {
-    padding: 1rem;
-  }
+  .success-message { font-size: 0.8rem; }
+  .submit-button { padding: 1rem; }
 }
 
 @media (max-width: 480px) {
-  .form-card {
-    padding: 1.5rem;
-  }
-  .form-card h1 {
-    font-size: 1.1rem;
-  }
-  .form-card .tagline {
-    font-size: 0.7rem;
-  }
+  .form-card { padding: 1.5rem; }
+  .form-card h1 { font-size: 1.1rem; }
+  .form-card .tagline { font-size: 0.7rem; }
   .form-group label,
   .form-group input,
   .submit-button,
   .back-to-login,
   .error-message,
-  .success-message {
-    font-size: 0.7rem;
-  }
-  .submit-button {
-    padding: 0.8rem;
-  }
+  .success-message { font-size: 0.7rem; }
+  .submit-button { padding: 0.8rem; }
 }
 </style>

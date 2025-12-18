@@ -134,8 +134,6 @@ const setMessage = (msg, type) => {
 </script>
 
 <style scoped>
-/* Styling kamu tetap dipertahankan 100% */
-/* Tidak diubah supaya tidak merusak layout */
 </style>
 
 
@@ -143,8 +141,8 @@ const setMessage = (msg, type) => {
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 :root {
-  --neon-green: #0f0;
-  --dark-green: #0a0;
+  --neon-green: rgb(16, 59, 211);
+  --dark-green: rgb(39, 122, 205);
   --dark-bg: #111;
   --card-bg: #222;
   --input-bg: #333;
@@ -201,7 +199,7 @@ const setMessage = (msg, type) => {
   text-align: center;
   max-width: 550px;
   width: 100%;
-  box-shadow: 0 0 20px rgba(0, 255, 0, 0.6), 0 0 30px rgba(0, 255, 0, 0.3);
+  box-shadow: 0 0 20px rgba(5, 39, 235, 0.6), 0 0 30px rgba(0, 255, 0, 0.3);
   position: relative;
   overflow: hidden;
 }
@@ -231,7 +229,7 @@ const setMessage = (msg, type) => {
   font-size: 2rem;
   margin-bottom: 2rem;
   color: var(--neon-green);
-  text-shadow: 0 0 8px rgba(0, 255, 0, 0.8);
+  text-shadow: 0 0 8px rgba(6, 124, 250, 0.8);
 }
 
 .profile-avatar-section {
@@ -248,7 +246,7 @@ const setMessage = (msg, type) => {
   height: 120px;
   border-radius: 50%;
   border: 4px solid var(--neon-green);
-  box-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
+  box-shadow: 0 0 15px rgba(2, 101, 250, 0.7);
   overflow: hidden;
   display: flex;
   justify-content: center;
@@ -330,7 +328,7 @@ const setMessage = (msg, type) => {
   margin-bottom: 0.6rem;
   font-size: 0.9rem;
   color: var(--neon-green);
-  text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+  text-shadow: 0 0 5px rgba(0, 76, 255, 0.5);
 }
 
 .form-group input {
@@ -342,14 +340,14 @@ const setMessage = (msg, type) => {
   font-family: 'Press Start 2P', monospace;
   border-radius: 4px;
   font-size: 0.85rem;
-  box-shadow: inset 0 0 5px rgba(0, 255, 0, 0.3);
+  box-shadow: inset 0 0 5px rgba(0, 64, 255, 0.3);
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .form-group input:focus {
   outline: none;
   border-color: var(--dark-green);
-  box-shadow: inset 0 0 8px rgba(0, 255, 0, 0.5), 0 0 10px var(--neon-green);
+  box-shadow: inset 0 0 8px rgba(0, 60, 255, 0.5), 0 0 10px var(--neon-green);
 }
 
 .form-group input::placeholder {
@@ -399,11 +397,11 @@ const setMessage = (msg, type) => {
   padding: 1rem;
   border-radius: 4px;
   font-family: 'Press Start 2P', monospace;
-  text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+  text-shadow: 0 0 5px rgba(0, 102, 255, 0.5);
 }
 
 .message.success {
-  background-color: rgba(0, 255, 0, 0.15);
+  background-color: rgba(13, 5, 136, 0.15);
   color: var(--neon-green);
   border: 1px solid var(--neon-green);
 }

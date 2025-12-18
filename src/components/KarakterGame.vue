@@ -3,63 +3,68 @@
     <main class="main-content">
       <div class="karakter-card">
 
-        <h1>Personality Scanner</h1>
-        <p class="subtitle">Pilih tes, jawab pertanyaan, dan sistem akan membaca pola jawabmu — bukan hanya skor.</p>
+        <h1>📘 English Basic Learning</h1>
+        <p class="subtitle">Belajar Bahasa Inggris dari dasar + game sederhana</p>
 
-        <!-- GAME SELECTOR -->
-        <div v-if="!started && !showResult" class="game-selector">
-          <h2>Pilih Tes</h2>
-          <div class="selector-list">
-            <button v-for="(g,key) in games" :key="key" class="selector-btn" @click="startGame(key)">
-              <div class="selector-title">{{ g.title }}</div>
-              <div class="selector-desc">{{ g.short }}</div>
-            </button>
-          </div>
+        <!-- ===== MENU ===== -->
+        <div v-if="page === 'menu'" class="menu">
+  <button @click="openMaterial('vocab-basic')">📚 Vocabulary</button>
+  <button @click="openMaterial('noun')">📦 Noun</button>
+  <button @click="openMaterial('verb')">🔤 Verb</button>
+  <button @click="openMaterial('adjective')">🎨 Adjective</button>
+  <button @click="openMaterial('pronoun')">👤 Pronoun</button>
+  <button @click="openMaterial('function')">🗣️ Function</button>
+  <button @click="openMaterial('sentence')">📝 Sentence</button>
+  <button @click="openMaterial('tenses')">⏱️ Tenses</button>
+  <button @click="openMaterial('expression')">💬 Expression</button>
+  <button @click="startGame">🎮 Game Quiz</button>
+</div>
+
+
+        <!-- ===== MATERIAL ===== -->
+        <div v-if="page === 'material'" class="material">
+          <button class="back-btn" @click="page='menu'">← Back</button>
+
+          <h2>{{ material.title }}</h2>
+          <p class="desc">{{ material.desc }}</p>
+
+          <ul>
+            <li v-for="(item,i) in material.examples" :key="i">
+              {{ item }}
+            </li>
+          </ul>
         </div>
 
-        <!-- QUESTION PANEL -->
-        <div v-else-if="started && !showResult" class="question-box">
-          <div class="question-header">
-            <button class="back-small" @click="cancelToMenu">← Back</button>
-            <div class="progress">Question {{ currentIndex + 1 }} / {{ currentQuestions.length }}</div>
+        <!-- ===== GAME ===== -->
+        <div v-if="page === 'game'" class="game">
+          <button class="back-btn" @click="page='menu'">← Back</button>
+
+          <div class="progress">
+            Question {{ index + 1 }} / {{ questions.length }}
           </div>
 
-          <h3 class="question">{{ currentQuestions[currentIndex].text }}</h3>
+          <h3>{{ questions[index].q }}</h3>
 
           <div class="choices">
             <button
-              v-for="(c,i) in currentQuestions[currentIndex].choices"
+              v-for="(c,i) in questions[index].choices"
               :key="i"
-              class="choice-btn"
-              @click="selectChoice(c.score)"
+              @click="answer(c)"
             >
-              {{ c.label }}
+              {{ c }}
             </button>
           </div>
 
-          <div class="hint">
-            <small>Tip: Jawabanmu disimpan sebagai pola — sistem menganalisa cara kamu memilih.</small>
-          </div>
+          <p v-if="feedback" class="feedback">{{ feedback }}</p>
         </div>
 
-        <!-- RESULT -->
-        <div v-else-if="showResult" class="result-box">
-          <h2>Hasil: <span class="type-badge">{{ result.type }}</span></h2>
-          <p class="result-desc">{{ result.description }}</p>
+        <!-- ===== RESULT ===== -->
+        <div v-if="page === 'result'" class="result">
+          <h2>🎉 Result</h2>
+          <p>Your Score: <strong>{{ score }}</strong></p>
 
-          <div class="result-meta">
-            <p><strong>Game:</strong> {{ games[currentGame].title }}</p>
-            <p><strong>Skor total:</strong> {{ score }}</p>
-            <p><strong>Pola jawaban:</strong> {{ answers.join(", ") }}</p>
-          </div>
-
-          <div class="result-actions">
-            <button class="save-btn" @click="saveResult">Simpan Hasil</button>
-            <button class="restart-btn" @click="restart">Ulang Tes</button>
-            <button class="menu-btn" @click="backToMenu">Kembali ke Menu</button>
-          </div>
-
-          <p v-if="saveMessage" class="save-msg">{{ saveMessage }}</p>
+          <button @click="restartGame">Play Again</button>
+          <button @click="page='menu'">Back to Menu</button>
         </div>
 
       </div>
@@ -67,471 +72,504 @@
   </div>
 </template>
 
+
 <script setup>
 import { ref } from "vue";
 
-/*
-  Personality Scanner (single-page)
-  - games: object each with questions + results thresholds
-  - uses answers[] to analyze pattern (not only sum)
-*/
 
-// ---------- GAMES CONFIG ----------
-const games = {
-  survival: {
-    title: "🔥 Survival Instinct Test",
-    short: "Quick decisions vs caution",
-    questions: [
-      { text: "Jika ada bahaya, apa reaksi awalmu?", choices: [
-        { label: "Langsung bertindak", score: 3 },
-        { label: "Menganalisis situasi", score: 2 },
-        { label: "Menjauh dulu", score: 1 }
-      ]},
-      { text: "Jika harus memilih, kamu lebih mengutamakan...", choices: [
-        { label: "Kecepatan", score: 3 },
-        { label: "Strategi", score: 2 },
-        { label: "Keamanan", score: 1 }
-      ]},
-      { text: "Jika tersesat di tempat asing...", choices: [
-        { label: "Cari jalan sendiri", score: 3 },
-        { label: "Cari tempat aman dulu", score: 2 },
-        { label: "Tunggu bantuan", score: 1 }
-      ]}
-    ],
-    results: [
-      { min: 8, type: "🔥 Alpha Survivor", description: "Pemimpin alami: cepat mengambil keputusan dan bertindak di saat genting." },
-      { min: 5, type: "🧠 Tactical Survivor", description: "Terencana: mengutamakan strategi dan penyusunan rencana sebelum bertindak." },
-      { min: 0, type: "🌙 Passive Survivor", description: "Hati-hati: memilih jalur aman dan menghindari risiko." }
-    ]
-  },
+const timeLeft = ref(20);
+let timer = null;
 
-  emotion: {
-    title: "💙 Emotional Reading Test",
-    short: "Respon emosional & empati",
-    questions: [
-      { text: "Saat temanmu marah padamu, kamu...", choices: [
-        { label: "Melawan balik", score: 3 },
-        { label: "Tetap tenang", score: 2 },
-        { label: "Menghindar", score: 1 }
-      ]},
-      { text: "Kamu menangis ketika...", choices: [
-        { label: "Terlalu marah / stres", score: 3 },
-        { label: "Tersentuh secara emosional", score: 2 },
-        { label: "Jarang menangis", score: 1 }
-      ]},
-      { text: "Jika melihat seseorang sedih, kamu...", choices: [
-        { label: "Langsung konfrontasi", score: 3 },
-        { label: "Mendekat dan dengarkan", score: 2 },
-        { label: "Memberi ruang", score: 1 }
-      ]}
-    ],
-    results: [
-      { min: 8, type: "🔥 Intense Soul", description: "Emosi kuat dan ekspresif; reaksi intens terhadap situasi emosional." },
-      { min: 5, type: "🌊 Deep Feeler", description: "Peka dan empatik; memahami perasaan orang lain." },
-      { min: 0, type: "🪶 Lighthearted", description: "Tenang dan stabil dalam emosi; tidak mudah terpancing." }
-    ]
-  },
-
-  logic: {
-    title: "🧠 Logic Pattern Test",
-    short: "Problem solving & pola pikir",
-    questions: [
-      { text: "Jika ada puzzle sulit, kamu...", choices: [
-        { label: "Langsung coba solusi", score: 3 },
-        { label: "Pikirkan pola terlebih dahulu", score: 2 },
-        { label: "Cari bantuan / referensi", score: 1 }
-      ]},
-      { text: "Kamu bekerja lebih baik saat...", choices: [
-        { label: "Tertekan", score: 3 },
-        { label: "Stabil & tenang", score: 2 },
-        { label: "Santai tanpa deadline", score: 1 }
-      ]},
-      { text: "Puzzle favoritmu?", choices: [
-        { label: "Rubik / matematika", score: 3 },
-        { label: "Teka-teki logis", score: 2 },
-        { label: "Teka-teki ringan", score: 1 }
-      ]}
-    ],
-    results: [
-      { min: 8, type: "⚡ Sharp-Mind", description: "Cepat dan agresif memecahkan masalah; suka tantangan kognitif." },
-      { min: 5, type: "🔍 Analyzer", description: "Teliti dan sistematis; mencari pola sebelum bertindak." },
-      { min: 0, type: "🌫 Casual Thinker", description: "Santai, memilih tingkat kesulitan yang nyaman." }
-    ]
-  }
-};
-
-// ---------- STATE ----------
-const started = ref(false);
-const currentGame = ref("");
-const currentQuestions = ref([]);
-const currentIndex = ref(0);
-const answers = ref([]);   // pola jawaban (nilai: 1/2/3)
+/* ===== STATE ===== */
+const page = ref("menu");
+const index = ref(0);
 const score = ref(0);
-const showResult = ref(false);
-const result = ref({ type: "", description: "" });
-const saveMessage = ref("");
+const feedback = ref("");
+/* ===== MATERIAL ===== */
+const material = ref({ title: "", desc: "", examples: [] });
 
-// ---------- ACTIONS ----------
-function startGame(key) {
-  currentGame.value = key;
-  currentQuestions.value = games[key].questions;
-  started.value = true;
-  currentIndex.value = 0;
-  answers.value = [];
-  score.value = 0;
-  showResult.value = false;
-  result.value = { type: "", description: "" };
-  saveMessage.value = "";
+function openMaterial(type) {
+  page.value = "material";
+
+  /* ================= BASIC VOCAB ================= */
+  if (type === "vocab-basic") {
+    material.value = {
+      title: "Basic Vocabulary (Kosakata Dasar)",
+      desc: "Kosakata dasar yang sering digunakan dalam kehidupan sehari-hari.",
+      examples: [
+        "I = Saya",
+        "You = Kamu",
+        "He = Dia (laki-laki)",
+        "She = Dia (perempuan)",
+        "It = Itu",
+        "We = Kami",
+        "They = Mereka",
+        "Yes = Ya",
+        "No = Tidak",
+        "Please = Tolong",
+        "Sorry = Maaf",
+        "Thank you = Terima kasih",
+        "Book = Buku",
+        "Pen = Pulpen",
+        "School = Sekolah"
+      ]
+    };
+  }
+
+  /* ================= NOUN ================= */
+  if (type === "noun") {
+    material.value = {
+      title: "Noun (Kata Benda)",
+      desc: "Noun adalah kata yang digunakan untuk menamai orang, tempat, benda, atau hewan.",
+      examples: [
+        "Teacher = Guru",
+        "Student = Murid",
+        "School = Sekolah",
+        "Classroom = Ruang kelas",
+        "Table = Meja",
+        "Chair = Kursi",
+        "Bag = Tas",
+        "Book = Buku",
+        "Dog = Anjing",
+        "Cat = Kucing",
+        "City = Kota",
+        "House = Rumah"
+      ]
+    };
+  }
+
+  /* ================= VERB ================= */
+  if (type === "verb") {
+    material.value = {
+      title: "Verb (Kata Kerja)",
+      desc: "Verb adalah kata kerja yang menunjukkan aktivitas atau keadaan.",
+      examples: [
+        "eat = makan → I eat rice",
+        "drink = minum → She drinks water",
+        "go = pergi → They go to school",
+        "come = datang → Come here",
+        "study = belajar → We study English",
+        "read = membaca → He reads a book",
+        "write = menulis → She writes a letter",
+        "play = bermain → They play football",
+        "sleep = tidur → I sleep early",
+        "watch = menonton → I watch TV"
+      ]
+    };
+  }
+
+  /* ================= ADJECTIVE ================= */
+  if (type === "adjective") {
+    material.value = {
+      title: "Adjective (Kata Sifat)",
+      desc: "Adjective adalah kata yang digunakan untuk menjelaskan sifat atau keadaan noun.",
+      examples: [
+        "Big = Besar",
+        "Small = Kecil",
+        "Good = Baik",
+        "Bad = Buruk",
+        "Happy = Senang",
+        "Sad = Sedih",
+        "Fast = Cepat",
+        "Slow = Lambat",
+        "Beautiful = Cantik",
+        "Smart = Pintar"
+      ]
+    };
+  }
+
+  /* ================= PRONOUN ================= */
+  if (type === "pronoun") {
+    material.value = {
+      title: "Pronoun (Kata Ganti)",
+      desc: "Pronoun digunakan untuk menggantikan noun agar tidak terjadi pengulangan.",
+      examples: [
+        "I = Saya",
+        "You = Kamu",
+        "He = Dia (laki-laki)",
+        "She = Dia (perempuan)",
+        "It = Itu",
+        "We = Kami",
+        "They = Mereka",
+        "My = Milik saya",
+        "Your = Milik kamu",
+        "His = Milik dia (laki-laki)"
+      ]
+    };
+  }
+
+  /* ================= FUNCTION ================= */
+  if (type === "function") {
+    material.value = {
+      title: "Function (Fungsi Kalimat)",
+      desc: "Function adalah tujuan penggunaan kalimat dalam percakapan.",
+      examples: [
+        "Greeting → Hello!",
+        "Introducing → My name is Rina",
+        "Asking → What is your name?",
+        "Thanking → Thank you very much",
+        "Apologizing → I'm sorry",
+        "Request → Please help me",
+        "Offering → Can I help you?",
+        "Asking permission → May I come in?",
+        "Giving opinion → I think it is good",
+        "Leave-taking → Goodbye"
+      ]
+    };
+  }
+
+  /* ================= SENTENCE ================= */
+  if (type === "sentence") {
+    material.value = {
+      title: "Simple Sentence (Kalimat Sederhana)",
+      desc: "Kalimat sederhana biasanya terdiri dari Subject + Verb + Object.",
+      examples: [
+        "I eat rice",
+        "She reads a book",
+        "They play football",
+        "We study English",
+        "He drinks milk",
+        "The teacher teaches students",
+        "I go to school every day"
+      ]
+    };
+  }
+
+  /* ================= TENSES ================= */
+  if (type === "tenses") {
+    material.value = {
+      title: "Basic Tenses (Waktu Dasar)",
+      desc: "Tenses digunakan untuk menunjukkan waktu terjadinya suatu kejadian.",
+      examples: [
+        "Simple Present → I eat rice",
+        "Simple Present → She studies English",
+        "Present Continuous → I am studying now",
+        "Simple Past → I ate rice yesterday",
+        "Simple Past → She went to school",
+        "Simple Future → I will study tonight",
+        "Present Perfect → I have finished my homework"
+      ]
+    };
+  }
+
+  /* ================= DAILY EXPRESSION ================= */
+  if (type === "expression") {
+    material.value = {
+      title: "Daily Expressions (Ungkapan Sehari-hari)",
+      desc: "Ungkapan yang sering digunakan dalam percakapan sehari-hari.",
+      examples: [
+        "How are you?",
+        "I'm fine, thank you",
+        "Nice to meet you",
+        "Excuse me",
+        "See you later",
+        "Take care",
+        "Good luck",
+        "Have a nice day"
+      ]
+    };
+  }
 }
 
-function cancelToMenu() {
-  // reset and return to selector
-  started.value = false;
-  currentGame.value = "";
-  currentQuestions.value = [];
-  currentIndex.value = 0;
-  answers.value = [];
-  score.value = 0;
-  showResult.value = false;
-  result.value = { type: "", description: "" };
-  saveMessage.value = "";
-}
 
-function selectChoice(s) {
-  // record pattern
-  answers.value.push(s);
-  score.value += s;
+/* ===== GAME DATA ===== */
+const questions = [
+  // ===== VOCABULARY =====
+  { q: "What is the meaning of 'Book'?", answer: "Buku", choices: ["Pulpen", "Buku", "Tas"] },
+  { q: "What is the English word for 'Sekolah'?", answer: "School", choices: ["House", "School", "Teacher"] },
 
-  // advance or analyze
-  if (currentIndex.value < currentQuestions.value.length - 1) {
-    currentIndex.value++;
-  } else {
-    analyzePersonality();
-  }
-}
+  // ===== NOUN =====
+  { q: "Which one is a noun?", answer: "Teacher", choices: ["Teacher", "Run", "Fast"] },
+  { q: "What is the meaning of 'Chair'?", answer: "Kursi", choices: ["Meja", "Kursi", "Pintu"] },
 
-// ---------- ANALYSIS BASED ON PATTERN ----------
-function analyzePersonality() {
-  showResult.value = true;
+  // ===== VERB =====
+  { q: "Which one is a verb?", answer: "Eat", choices: ["Book", "Eat", "School"] },
+  { q: "What does 'go' mean?", answer: "Pergi", choices: ["Makan", "Pergi", "Tidur"] },
 
-  const arr = answers.value.slice(); // copy
-  const sum = score.value;
+  // ===== ADJECTIVE =====
+  { q: "Which word describes something?", answer: "Big", choices: ["Run", "Big", "Teacher"] },
+  { q: "What is the opposite of 'Fast'?", answer: "Slow", choices: ["Slow", "Good", "Tall"] },
 
-  const high = arr.filter(x => x === 3).length;
-  const mid = arr.filter(x => x === 2).length;
-  const low = arr.filter(x => x === 1).length;
+  // ===== PRONOUN =====
+  { q: "Which one is a pronoun?", answer: "She", choices: ["She", "Book", "Run"] },
+  { q: "‘They’ is used for…", answer: "Many people or things", choices: ["One person", "Many people or things", "One object"] },
 
-  // 1) semua tinggi
-  if (high === arr.length) {
-    result.value = {
-      type: "🔥 Pure Alpha",
-      description: "Kamu konsisten memilih jawaban paling agresif/aktif — sifat dominan dan cepat bertindak."
-    };
-    return;
-  }
+  // ===== FUNCTION =====
+  { q: "Which sentence is used for greeting?", answer: "Hello!", choices: ["Hello!", "Thank you", "Goodbye"] },
+  { q: "Which sentence is used to say thank you?", answer: "Thank you very much", choices: ["I'm sorry", "Thank you very much", "Excuse me"] },
 
-  // 2) semua rendah
-  if (low === arr.length) {
-    result.value = {
-      type: "🌙 Ultra Cautious",
-      description: "Kamu memilih opsi paling aman. Sangat berhati-hati dan menghindari risiko."
-    };
-    return;
-  }
+  // ===== SIMPLE SENTENCE =====
+  { q: "Which one is a correct sentence?", answer: "I eat rice", choices: ["Eat rice I", "I eat rice", "Rice eat I"] },
+  { q: "Which sentence is correct?", answer: "She reads a book", choices: ["She read a book", "She reads a book", "She reading book"] },
 
-  // 3) semua tengah
-  if (mid === arr.length) {
-    result.value = {
-      type: "🧠 Balanced Thinker",
-      description: "Kamu stabil, rasional, dan konsisten. Keputusan yang seimbang dan terencana."
-    };
-    return;
-  }
+  // ===== TENSES =====
+  { q: "Which sentence is Simple Present?", answer: "I study English", choices: ["I studied English", "I study English", "I am studying English"] },
+  { q: "Which sentence is Simple Past?", answer: "I ate rice yesterday", choices: ["I eat rice", "I am eating rice", "I ate rice yesterday"] },
 
-  // 4) pola naik→turun→naik (contoh)
-  if (arr.length >= 3 && arr[0] < arr[1] && arr[1] > arr[2]) {
-    result.value = {
-      type: "⚡ Unpredictable",
-      description: "Gaya jawabanmu naik turun — spontan dan sulit ditebak. Energi tinggi tapi fluktuatif."
-    };
-    return;
-  }
+  // ===== DAILY EXPRESSION =====
+  { q: "What do you say when meeting someone?", answer: "Nice to meet you", choices: ["Good night", "Nice to meet you", "See you later"] },
+  { q: "Which expression asks permission?", answer: "May I come in?", choices: ["Thank you", "May I come in?", "Goodbye"] },
 
-  // 5) awal ragu (1) -> akhir agresif (3)
-  if (arr[0] === 1 && arr[arr.length - 1] === 3) {
-    result.value = {
-      type: "🌅 Rising Confidence",
-      description: "Kepercayaan dirimu tumbuh seiring pertanyaan. Kamu menjadi lebih berani saat diuji."
-    };
-    return;
-  }
+  // ===== MIX =====
+  { q: "Which one is an adjective?", answer: "Beautiful", choices: ["Beautiful", "Run", "Teacher"] },
+  { q: "Which one is a verb?", answer: "Play", choices: ["Play", "Book", "Chair"] }
+];
 
-  // 6) awal agresif (3) -> akhir ragu (1)
-  if (arr[0] === 3 && arr[arr.length - 1] === 1) {
-    result.value = {
-      type: "🌫 Hidden Doubt",
-      description: "Kamu terlihat tegas di awal tetapi menjadi lebih berhati-hati seiring waktu — mungkin ada keraguan tersembunyi."
-    };
-    return;
-  }
 
-  // 7) campuran tanpa pola khas -> fallback ke thresholds per game
-  calculateResultScore(sum);
-}
 
-function calculateResultScore(sum) {
-  const resList = games[currentGame.value].results;
-  // choose first matching threshold (resList should be sorted desc by min)
-  for (let r of resList) {
-    if (sum >= r.min) {
-      result.value = { type: r.type, description: r.description };
-      return;
+function startTimer() {
+  timeLeft.value = 20;
+
+  timer = setInterval(() => {
+    timeLeft.value--;
+
+    if (timeLeft.value <= 0) {
+      clearInterval(timer);
+      feedback.value = "⏰ Time's up!";
+
+      setTimeout(nextQuestion, 700);
     }
-  }
-  // fallback generic
-  result.value = {
-    type: "🔎 Undefined",
-    description: "Hasil sulit ditentukan — kombinasi jawabanmu unik."
-  };
+  }, 1000);
 }
 
-// ---------- SAVE / RESTART ----------
-function saveResult() {
-  try {
-    const saved = JSON.parse(localStorage.getItem("personality_results_v1") || "[]");
-    saved.unshift({
-      game: currentGame.value,
-      type: result.value.type,
-      description: result.value.description,
-      score: score.value,
-      answers: answers.value.slice(),
-      ts: Date.now()
-    });
-    // keep last 50
-    localStorage.setItem("personality_results_v1", JSON.stringify(saved.slice(0,50)));
-    saveMessage.value = "Hasil disimpan ke localStorage.";
-  } catch (e) {
-    saveMessage.value = "Gagal menyimpan hasil.";
+function nextQuestion() {
+  feedback.value = "";
+
+  if (index.value < questions.length - 1) {
+    index.value++;
+    startTimer();
+  } else {
+    page.value = "result";
   }
 }
 
-function restart() {
-  // restart same test
-  currentIndex.value = 0;
-  answers.value = [];
+function startGame() {
+  page.value = "game";
+  index.value = 0;
   score.value = 0;
-  showResult.value = false;
-  result.value = { type: "", description: "" };
-  saveMessage.value = "";
+  feedback.value = "";
+  startTimer();
 }
 
-function backToMenu() {
-  // go back to selector
-  started.value = false;
-  currentGame.value = "";
-  currentQuestions.value = [];
-  currentIndex.value = 0;
-  answers.value = [];
-  score.value = 0;
-  showResult.value = false;
-  result.value = { type: "", description: "" };
-  saveMessage.value = "";
+
+/* ===== GAME LOGIC ===== */
+function answer(choice) {
+  clearInterval(timer);
+
+  if (choice === questions[index.value].answer) {
+    score.value += 5;
+    feedback.value = "✅ Correct!";
+  } else {
+    feedback.value = "❌ Wrong!";
+  }
+
+  setTimeout(() => {
+    nextQuestion();
+  }, 700);
 }
+
+
+function restartGame() {
+  clearInterval(timer);
+  startGame();
+}
+
 </script>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
+/* ===== ROOT ===== */
 .karakter-content-wrapper {
-  background-color: #bdc5b4;
+  background: linear-gradient(135deg, #0b1220, #020617);
   min-height: 100vh;
   display: flex;
-  align-items: center;
   justify-content: center;
-  padding: 32px 18px;
+  align-items: center;
+  padding: 40px 20px;
   font-family: 'Press Start 2P', monospace;
-  color: #e9fff0;
+  color: #e0f2ff;
 }
 
 .main-content {
   width: 100%;
-  max-width: 820px;
+  max-width: 880px;
 }
 
+/* ===== CARD ===== */
 .karakter-card {
-  background: linear-gradient(180deg, rgba(4,6,4,0.9), rgba(8,10,8,0.98));
-  border: 2px solid #0f0;
-  padding: 28px;
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(0,255,0,0.3);
-  text-align: center;
+  background: linear-gradient(180deg, #0f172a, #020617);
+  border-radius: 18px;
+  padding: 32px;
+  box-shadow:
+    0 20px 40px rgba(0,0,0,0.4),
+    inset 0 0 0 1px rgba(56,189,248,0.35);
 }
 
-/* TITLE */
+/* ===== HEADER ===== */
 h1 {
-  color: #22ff88;
+  font-size: 1.2rem;
+  color: #7dd3fc;
+  margin-bottom: 10px;
   text-align: center;
-  margin-bottom: 6px;
-  text-shadow: 0 0 8px rgba(0,255,0,0.4);
-  font-size: 1.1rem;
+  text-shadow: 0 0 8px rgba(56,189,248,.5);
 }
 
 .subtitle {
-  text-align: center;
-  color: #9fdab0;
-  margin-bottom: 18px;
-  font-size: 0.7rem;
-}
-
-/* SELECTOR */
-.game-selector { text-align: center; }
-.selector-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(220px,1fr));
-  gap: 12px;
-  margin-top: 14px;
-}
-.selector-btn {
-  background: #111;
-  border: 2px solid #0f0;
-  padding: 12px;
-  border-radius: 10px;
-  cursor: pointer;
-  color: #dfffe0;
-  transition: transform .15s ease, box-shadow .15s ease, border-color .2s;
-  font-family: 'Press Start 2P', monospace;
-}
-.selector-btn:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 0 20px rgba(0,255,0,0.6);
-  border-color: #0f0;
-}
-.selector-title {
-  font-weight: 800;
-  color: #eaffef;
-  margin-bottom: 6px;
-  font-size: .75rem;
-}
-.selector-desc {
-  color: #bfe7c4;
-  font-size: 0.6rem;
-}
-
-/* QUESTION SECTION */
-.question-box { margin-top: 12px; }
-.question-header {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom: 12px;
-}
-.back-small {
-  background: transparent;
-  color: #0f0;
-  border: 2px solid #0f0;
-  padding: 6px 10px;
-  border-radius:8px;
-  cursor:pointer;
-  font-family: 'Press Start 2P', monospace;
-  font-size: .6rem;
-}
-.progress { color: #bfe7c4; font-size: .65rem; }
-.question {
-  color: #dfffe0;
-  font-size: 0.75rem;
-  margin-bottom: 12px;
-}
-.choices { display:flex; flex-direction:column; gap:10px; }
-.choice-btn {
-  background: #111;
-  border: 2px solid #0f0;
-  color: #cfdccf;
-  font-weight: 700;
-  padding: 12px;
-  border-radius: 10px;
-  cursor: pointer;
-  font-family: 'Press Start 2P', monospace;
-  font-size: .7rem;
-}
-.choice-btn:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 0 20px rgba(0,255,0,0.5);
-}
-
-/* RESULT */
-.result-box { margin-top: 12px; text-align: center; }
-.type-badge {
-  display:inline-block;
-  background: rgba(34,255,136,0.06);
-  color: #22ff88;
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 2px solid #0f0;
-  font-weight: 800;
-  font-size: .7rem;
-}
-.result-desc {
-  margin: 12px auto;
-  color:#d9fbd3;
-  max-width:720px;
-  line-height:1.6;
   font-size: .65rem;
-}
-.result-meta {
-  margin-top: 10px;
-  color:#b8eac0;
-  font-size: .6rem;
-}
-
-.result-actions {
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  margin-top:14px;
-  flex-wrap:wrap;
+  color: #bae6fd;
+  margin-bottom: 26px;
+  text-align: center;
+  line-height: 1.7;
 }
 
-.save-btn, .restart-btn, .menu-btn {
-  padding: 10px 14px;
-  border-radius: 10px;
+/* ===== MENU ===== */
+.menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px,1fr));
+  gap: 18px;
+}
+
+.menu button {
+  background: linear-gradient(180deg,#020617,#0f172a);
+  border-radius: 16px;
+  padding: 18px;
+  border: 1px solid rgba(56,189,248,0.45);
+  color: #e0f2ff;
   cursor: pointer;
+  transition: all .25s ease;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+
+.menu button:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(56,189,248,0.45);
+}
+
+/* ===== MATERIAL ===== */
+.material {
+  text-align: left;
+}
+
+.material h2 {
+  font-size: .9rem;
+  color: #7dd3fc;
+  margin-bottom: 14px;
+}
+
+.material .desc {
+  font-size: .65rem;
+  color: #bae6fd;
+  margin-bottom: 18px;
+  line-height: 1.7;
+}
+
+.material ul {
+  padding-left: 18px;
+}
+
+.material li {
+  font-size: .65rem;
+  margin-bottom: 10px;
+  color: #e0f2ff;
+}
+
+/* ===== GAME ===== */
+.game {
+  text-align: center;
+}
+
+.progress {
+  font-size: .6rem;
+  color: #bae6fd;
+  margin-bottom: 12px;
+}
+
+.game h3 {
+  font-size: .75rem;
+  margin-bottom: 18px;
+  color: #e0f2ff;
+}
+
+.choices {
+  display: grid;
+  gap: 14px;
+}
+
+.choices button {
+  background: linear-gradient(180deg,#020617,#0f172a);
+  border-radius: 14px;
+  padding: 14px;
+  border: 1px solid rgba(56,189,248,.5);
+  color: #e0f2ff;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.choices button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 24px rgba(56,189,248,.45);
+}
+
+.feedback {
+  margin-top: 14px;
+  font-size: .65rem;
+  color: #7dd3fc;
+}
+
+/* ===== RESULT ===== */
+.result {
+  text-align: center;
+}
+
+.result h2 {
+  font-size: 1rem;
+  color: #7dd3fc;
+  margin-bottom: 14px;
+}
+
+.result p {
+  font-size: .65rem;
+  margin-bottom: 18px;
+  color: #e0f2ff;
+}
+
+.result button {
+  background: linear-gradient(180deg,#38bdf8,#0ea5e9);
+  border-radius: 14px;
+  padding: 12px 16px;
   border: none;
-  font-weight:700;
-  font-family: 'Press Start 2P', monospace;
-  font-size: .7rem;
+  color: #020617;
+  font-size: .65rem;
+  margin: 6px;
+  cursor: pointer;
 }
 
-.save-btn {
-  background: #0f0;
-  color:#041004;
-  border: 2px solid #0a0;
-  box-shadow: 0 0 12px rgba(0,255,0,0.4);
-}
-.restart-btn, .menu-btn {
+.result button:last-child {
   background: transparent;
-  border: 2px solid #0f0;
-  color:#dfffe0;
-}
-.restart-btn:hover, .menu-btn:hover {
-  background: rgba(0,255,0,0.1);
+  border: 1px solid #38bdf8;
+  color: #e0f2ff;
 }
 
-.save-msg {
-  margin-top:10px;
-  color:#0f0;
+/* ===== BACK BUTTON ===== */
+.back-btn {
+  margin-bottom: 14px;
+  background: transparent;
+  border: 1px solid #38bdf8;
+  padding: 6px 12px;
+  border-radius: 10px;
   font-size: .6rem;
+  color: #7dd3fc;
+  cursor: pointer;
 }
 
-/* small helpers */
-.hint {
-  margin-top: 12px;
-  color: #a8f6bb;
-  font-size: .6rem;
-}
-
-/* responsive */
-@media (max-width:720px) {
-  .selector-list { grid-template-columns: 1fr; }
-  .karakter-card { padding: 18px;}
+/* ===== RESPONSIVE ===== */
+@media (max-width: 720px) {
+  .karakter-card {
+    padding: 22px;
+  }
+  h1 {
+    font-size: 1rem;
+  }
 }
 </style>

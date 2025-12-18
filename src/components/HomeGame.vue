@@ -6,8 +6,8 @@
     <div class="bubble-layer3"></div>
 
     <main class="content" aria-live="polite">
-      <h1 class="title">Welcome to EBT!</h1>
-      <p class="subtitle">English Brain Training — Ready to boost your skills?</p>
+      <h1 class="title">Welcome to QUIZ!</h1>
+      <p class="subtitle">FUN VOCABULARY LEARNING QUIZ — Ready to boost your skills?</p>
 
       <div class="controls">
         <button
@@ -127,7 +127,7 @@ onUnmounted(stopCountdown);
 .home-wrapper {
   width: 100%;
   height: calc(100vh - var(--navbar-height, 0px) - var(--footer-height, 0px));
-  background: linear-gradient(180deg, #0d3b2e, #06251c, #031510);
+  background: linear-gradient(180deg, #081a33, #020c1b, #010814);
   position: relative;
   overflow: hidden;
 
@@ -135,53 +135,63 @@ onUnmounted(stopCountdown);
   align-items: center;
   justify-content: center;
 
-  color: #eafff3;
+  color: #e6f6ff;
   font-family: "Nunito", sans-serif;
 }
 
-/* BUBBLE PARTICLES */
+/* PARTICLE BACKGROUND */
 .bubble-layer,
 .bubble-layer2,
 .bubble-layer3 {
   position: absolute;
   width: 200%;
   height: 200%;
-  background: radial-gradient(circle, rgba(120,255,170,0.12) 1px, transparent 2px);
+  background: radial-gradient(circle, rgba(120,200,255,0.14) 1px, transparent 2px);
   animation: float 120s linear infinite;
 }
-.bubble-layer2 { opacity: 0.12; animation-duration: 160s; }
-.bubble-layer3 { opacity: 0.07; animation-duration: 200s; }
+
+.bubble-layer2 {
+  opacity: 0.12;
+  animation-duration: 160s;
+}
+
+.bubble-layer3 {
+  opacity: 0.07;
+  animation-duration: 200s;
+}
 
 @keyframes float {
   from { transform: translateY(0); }
   to { transform: translateY(-900px); }
 }
 
-/* CONTENT */
+/* MAIN CONTENT */
 .content {
   text-align: center;
-  padding: 1rem;
+  padding: 1.2rem;
   z-index: 10;
 }
 
 .title {
-  font-size: 2rem;
-  color: #c9ffe1;
-  text-shadow: 0 0 18px rgba(0,255,170,0.4);
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #bfe9ff;
+  text-shadow: 0 0 24px rgba(120,200,255,0.65);
 }
 
 .subtitle {
   margin-top: 8px;
   font-size: 1rem;
-  opacity: 0.9;
-  color: #a8ffd7;
+  color: #9fdcff;
+  opacity: 0.95;
 }
 
-/* BUTTON START */
+/* START BUTTON */
 .start-btn {
-  background: linear-gradient(45deg, #00ffae, #00c97a);
-  color: #003922;
-  
+  margin-top: 1.5rem;
+  background: linear-gradient(45deg, #38bdf8, #0ea5e9);
+  color: #021b2d;
+
   padding: 1rem 2.8rem;
   border-radius: 18px;
 
@@ -190,20 +200,23 @@ onUnmounted(stopCountdown);
 
   border: none;
   cursor: pointer;
-  transition: 0.2s;
+  transition: 0.2s ease;
+
   box-shadow:
-    0 0 15px rgba(0,255,150,0.6),
-    inset 0 0 8px rgba(255,255,255,0.2);
-}
-.start-btn:hover {
-  transform: scale(1.05);
-  box-shadow:
-    0 0 25px rgba(0,255,150,0.8),
-    inset 0 0 12px rgba(255,255,255,0.3);
+    0 0 20px rgba(56,189,248,0.75),
+    inset 0 0 10px rgba(255,255,255,0.25);
 }
 
-/* COUNTDOWN AREA */
+.start-btn:hover {
+  transform: scale(1.06);
+  box-shadow:
+    0 0 32px rgba(56,189,248,0.95),
+    inset 0 0 14px rgba(255,255,255,0.35);
+}
+
+/* COUNTDOWN */
 .countdown-area {
+  margin-top: 1.2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -211,12 +224,13 @@ onUnmounted(stopCountdown);
 }
 
 .countdown-bubble {
-  width: 215px;
-  height: 215px;
+  width: 210px;
+  height: 210px;
   border-radius: 50%;
 
-  background: linear-gradient(180deg, #d9ffe9, #9ef9ca);
-  color: #003522;
+  background: linear-gradient(180deg, #e0f4ff, #b6e6ff);
+  color: #042338;
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -224,44 +238,48 @@ onUnmounted(stopCountdown);
   font-size: 3.5rem;
   font-weight: 900;
 
-  box-shadow: 0 0 35px rgba(0,255,170,0.45);
+  box-shadow: 0 0 42px rgba(120,200,255,0.65);
   transition: 0.25s ease;
 }
 
-/* "GO!" Explosion Style */
+/* GO EFFECT */
 .countdown-bubble.go {
-  background: linear-gradient(45deg, #00ffae, #00d887);
-  color: white;
-  font-size: 2.4rem;
+  background: linear-gradient(45deg, #38bdf8, #0ea5e9);
+  color: #ffffff;
+  font-size: 2.6rem;
   animation: pop 0.45s ease;
-  box-shadow: 0 0 55px rgba(0,255,170,0.6);
+  box-shadow: 0 0 65px rgba(56,189,248,0.95);
 }
 
 @keyframes pop {
   0% { transform: scale(0.7); }
-  50% { transform: scale(1.25); }
+  50% { transform: scale(1.3); }
   100% { transform: scale(1); }
 }
 
+/* CANCEL BUTTON */
 .cancel-btn {
   background: rgba(0,0,0,0.45);
-  padding: 10px 22px;
-  border: 2px solid #00ffae;
+  padding: 10px 24px;
+  border: 2px solid #38bdf8;
   border-radius: 10px;
+
   font-size: 0.9rem;
-  color: #c9ffe9;
+  color: #d6f2ff;
 
   cursor: pointer;
-  transition: .15s;
+  transition: 0.15s ease;
 }
+
 .cancel-btn:hover {
   background: rgba(0,0,0,0.7);
 }
 
+/* HINT */
 .hint {
   margin-top: 14px;
   font-size: 0.85rem;
-  opacity: 0.85;
-  color: #aaffdd;
+  color: #bfe9ff;
+  opacity: 0.9;
 }
 </style>

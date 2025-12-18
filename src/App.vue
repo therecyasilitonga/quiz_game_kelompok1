@@ -4,7 +4,7 @@
       <div class="navbar-left">
         <div class="logo-container">
           <img src="./assets/EBT.svg" alt="Game Logo" class="logo-img" />
-          <span class="logo-text">ENGLISH BRAIN TRAINING</span>
+          <span class="logo-text">FUN VOCABULARY lEARNING QUIZ</span>
         </div>
         <div
           class="greeting-container"
@@ -20,12 +20,16 @@
           <router-link to="/homegame">Home</router-link>
         </li>
         <li>
-          <router-link to="/info">Info Game</router-link>
+          <router-link to="/info">Info</router-link>
         </li>
         <li>
-          <router-link to="/karakter">Karakter</router-link>
+          <router-link to="/karakter">Pembelajaran</router-link>
         </li>
       </ul>
+
+      
+
+
 
       <div class="navbar-right">
         <!-- GANTI ICON FONT AWESOME DENGAN GAMBAR -->
@@ -247,7 +251,7 @@ const handleLogout = () => {
 }
 
 .nav-links li a:hover {
-  color: #0f0;
+  color: rgb(7, 27, 249);
 }
 
 .profile-icon-link {
@@ -260,14 +264,14 @@ const handleLogout = () => {
   height: 38px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #0f0;
+  border: 2px solid rgb(0, 64, 255);
   cursor: pointer;
 }
 
 .login-button {
   background-color: #333;
   color: #fff;
-  border: 2px solid #0f0;
+  border: 2px solid rgb(0, 106, 255);
   padding: 0.5rem 1rem;
   cursor: pointer;
   font-family: 'Press Start 2P', monospace;
@@ -276,7 +280,7 @@ const handleLogout = () => {
 }
 
 .login-button:hover {
-  background-color: #0f0;
+  background-color: rgb(0, 55, 255);
   color: #111;
   border-color: #fff;
 }
